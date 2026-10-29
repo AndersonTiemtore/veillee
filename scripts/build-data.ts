@@ -573,8 +573,14 @@ function extract(store: Store) {
 // Output
 // ---------------------------------------------------------------------------
 
+/** GeoJSON is also served as static files, fetched by the map at runtime. */
+const PUBLIC_OUT = join(ROOT, "public/data");
+
 function write(name: string, data: unknown) {
-  writeFileSync(join(OUT, name), JSON.stringify(data, null, name.endsWith(".geojson") ? 0 : 1));
+  const geo = name.endsWith(".geojson");
+  const body = JSON.stringify(data, null, geo ? 0 : 1);
+  writeFileSync(join(OUT, name), body);
+  if (geo) writeFileSync(join(PUBLIC_OUT, name), body);
 }
 
 function validate<T>(name: string, schema: z.ZodType<T>, data: unknown): T {
@@ -631,6 +637,7 @@ function searchIndex(d: ReturnType<typeof extract>): SearchEntry[] {
 function main() {
   const started = Date.now();
   mkdirSync(OUT, { recursive: true });
+  mkdirSync(PUBLIC_OUT, { recursive: true });
 
   const store = loadStore();
   const sourceTriples = store.size;

@@ -29,11 +29,11 @@
 - [x] Tests Vitest : une règle = un test sur mini-graphe ; Yennenga → Nakambé, Sabou → Nando, Bazoulé/Dafra régionalisés, Yennenga interactif, 17 régions
 
 ## Phase 3 — Carte
-- [ ] `/carte` : polygones, survol/infobulle, `flyTo`, panneau/tiroir, marqueurs + clusters, filtres dans l'URL
-- [ ] 2D/3D (Terrarium, pitch 50, extrusion), mode faible débit
-- [ ] Liste textuelle accessible des régions
-- [ ] `/regions/[slug]`
-- [ ] Playwright : carte → Nakambé → Yennenga → page du récit
+- [x] `/carte` : polygones, survol/infobulle, `flyTo`, panneau/tiroir, marqueurs + clusters, filtres dans l'URL
+- [x] 2D/3D (Terrarium, pitch 50, extrusion), mode faible débit
+- [x] Liste textuelle accessible des régions
+- [x] `/regions/[slug]`
+- [x] Playwright : carte → Nakambé → Yennenga → page du récit
 
 ## Phase 4 — Récits et lecteur
 - [ ] `/contes` (grille, filtres, tri, états vides)

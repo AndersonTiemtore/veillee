@@ -53,3 +53,5 @@ next-env.d.ts
 # course brief (contains personal contact)
 /Projet Web Multim*dia.pdf
 
+/public/data/
+/public/vendor/

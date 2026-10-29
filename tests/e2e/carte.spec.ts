@@ -1,0 +1,47 @@
+import { expect, test } from "@playwright/test";
+
+test("carte → Nakambé → Yennenga → page du récit", async ({ page }) => {
+  // A visible canvas is not enough: a broken worker only shows in the console.
+  const errors: string[] = [];
+  page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  page.on("pageerror", (e) => errors.push(e.message));
+
+  await page.goto("/carte");
+  await expect(page.locator(".maplibregl-canvas")).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(errors).toEqual([]);
+
+  await page.getByRole("button", { name: /Nakambé/ }).click();
+  await expect(page).toHaveURL(/region=nakambe/);
+
+  const panel = page.getByRole("complementary", { name: "Nakambé" });
+  await expect(panel).toBeVisible();
+  const story = panel.getByRole("link", { name: /Yennenga, la cavalière/ });
+  await expect(story).toBeVisible();
+
+  await story.click();
+  await expect(page).toHaveURL(/\/contes\/yennenga-la-cavaliere$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Yennenga, la cavalière");
+});
+
+test("les filtres sont reflétés dans l'URL", async ({ page }) => {
+  await page.goto("/carte?type=fable");
+  await expect(page.getByLabel("Type de récit")).toHaveValue("fable");
+  await expect(page.getByText("1 récit", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Effacer les filtres" }).click();
+  await expect(page).not.toHaveURL(/type=/);
+});
+
+test("la liste des régions est disponible sans la carte", async ({ page }) => {
+  await page.goto("/carte");
+  await expect(page.getByRole("heading", { name: "Les 17 régions" })).toBeVisible();
+  const buttons = page.getByRole("region", { name: "Les 17 régions" }).getByRole("button");
+  await expect(buttons).toHaveCount(17);
+});
+
+test("fiche région : Nakambé", async ({ page }) => {
+  await page.goto("/regions/nakambe");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Nakambé");
+  await expect(page.getByRole("heading", { name: "Autour de ces récits" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Yennenga/ })).toBeVisible();
+});

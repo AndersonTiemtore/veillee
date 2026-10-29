@@ -114,6 +114,24 @@
   }
 }
 
+/* MapLibre popup in the night palette. */
+.veillee-popup .maplibregl-popup-content {
+  background: var(--nuit);
+  color: var(--karite);
+  border: 1px solid rgb(232 163 61 / 0.4);
+  border-radius: var(--r-card);
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  padding: 0.625rem 0.875rem;
+}
+.veillee-popup .maplibregl-popup-tip {
+  border-top-color: var(--nuit);
+  border-bottom-color: var(--nuit);
+}
+.maplibregl-ctrl-attrib {
+  font-family: var(--font-sans);
+}
+
 /* Gentle flicker for the flame that marks the active story. */
 @keyframes flicker {
   0%,
