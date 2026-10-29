@@ -1,0 +1,104 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# =====================================================================
+#  Requêtes SPARQL utilisées par la plateforme (à exécuter sur le
+#  dataset Fuseki avec raisonneur : les propriétés inférées sont visibles)
+# =====================================================================
+
+# --- Q1. Carte : nombre de récits par région (choroplèthe des 17 régions)
+SELECT ?region ?nom ?code (COUNT(DISTINCT ?r) AS ?nbRecits) WHERE {
+  ?region a onto:Region ; onto:nomLocalite ?nom ; onto:codeLocalite ?code .
+  OPTIONAL { ?r onto:estRaconteDansRegion ?region }
+} GROUP BY ?region ?nom ?code ORDER BY DESC(?nbRecits)
+
+# --- Q2. Carte : marqueurs des récits ancrés sur un site (point WKT)
+SELECT ?r ?titre ?slug ?type ?wkt WHERE {
+  ?r onto:estAncreSur ?site ; onto:titre ?titre ; onto:slug ?slug ; a ?type .
+  ?site onto:geometrieWKT ?wkt .
+  FILTER(?type IN (onto:Conte, onto:Fable, onto:Legende, onto:MytheFondateur, onto:RecitHistorique))
+}
+
+# --- Q3. Carte : marqueurs des récits rattachés à une localité (lat/long)
+SELECT ?r ?titre ?slug ?lat ?lon WHERE {
+  ?r onto:seDerouleDans ?l ; onto:titre ?titre ; onto:slug ?slug .
+  ?l onto:latitude ?lat ; onto:longitude ?lon .
+}
+
+# --- Q4. Fiche région : contexte culturel (panneau « Autour de ce conte »)
+#     Remplacer onto:loc_nakambe par la région affichée.
+SELECT ?categorie ?item ?label WHERE {
+  VALUES ?region { onto:loc_nakambe }
+  {
+    BIND("Langues parlées" AS ?categorie)
+    ?item onto:estParleeDans ?region ; onto:nomLangue ?label .
+  } UNION {
+    BIND("Ethnies" AS ?categorie)
+    ?item onto:habite ?region ; onto:nomEthnie ?label .
+  } UNION {
+    BIND("Sites à visiter" AS ?categorie)
+    ?item onto:estSitueDans ?l ; onto:nomSite ?label .
+    ?l onto:estDansRegion ?region .
+  } UNION {
+    BIND("Instruments" AS ?categorie)
+    ?item onto:estAssocieARegion ?region ; onto:nomInstrument ?label .
+  }
+}
+
+# --- Q5. Fiche conte : tout ce qu'il faut pour la page /contes/{slug}
+SELECT ?r ?titre ?resume ?ethnie ?langue ?audio ?vtt ?instrument ?site WHERE {
+  ?r onto:slug "yennenga-la-cavaliere" ; onto:titre ?titre .
+  OPTIONAL { ?r onto:resume ?resume }
+  OPTIONAL { ?r onto:provientDeEthnie/onto:nomEthnie ?ethnie }
+  OPTIONAL { ?r onto:aPourVersion ?v . ?v onto:estRaconteeEn/onto:nomLangue ?langue .
+             OPTIONAL { ?v onto:urlAudio ?audio } OPTIONAL { ?v onto:urlSousTitres ?vtt } }
+  OPTIONAL { ?r onto:estAccompagneParInstrument/onto:nomInstrument ?instrument }
+  OPTIONAL { ?r onto:estAncreSur/onto:nomSite ?site }
+}
+
+# --- Q6. Mode « Vivre » : scènes et choix d'une version
+SELECT ?ordre ?texte ?choix ?libelle ?vraieFin ?cible WHERE {
+  onto:v_yennenga_fr onto:aPourScene ?s .
+  ?s onto:ordreScene ?ordre ; onto:texteScene ?texte .
+  OPTIONAL { ?s onto:proposeChoix ?choix . ?choix onto:libelleChoix ?libelle ;
+             onto:estVraieFin ?vraieFin ; onto:choixMeneA ?cible }
+} ORDER BY ?ordre
+
+# --- Q7. Filtres : récits par langue disponible et par thème
+SELECT DISTINCT ?r ?titre WHERE {
+  ?r onto:titre ?titre ; onto:estDisponibleEnLangue onto:langue_moore ; onto:aPourTheme onto:theme_origine .
+}
+
+# --- Q8. Recommandations « Vous aimerez aussi »
+SELECT DISTINCT ?autre ?titre WHERE {
+  { onto:recit_legende_yennenga onto:estLieA ?autre }
+  UNION
+  { onto:recit_legende_yennenga onto:aPourTheme ?t . ?autre onto:aPourTheme ?t }
+  UNION
+  { onto:recit_legende_yennenga onto:estRaconteDansRegion ?reg . ?autre onto:estRaconteDansRegion ?reg }
+  ?autre onto:titre ?titre .
+  FILTER(?autre != onto:recit_legende_yennenga)
+}
+
+# --- Q9. Back-office : tableau de bord de collecte
+SELECT ?statut (COUNT(?r) AS ?n) WHERE {
+  ?r a onto:RecitOral ; onto:statutCollecte ?statut .
+} GROUP BY ?statut
+
+# --- Q10. Back-office : langues à enregistrer en priorité
+SELECT ?r ?titre ?langue WHERE {
+  ?r onto:langueAEnregistrer ?l ; onto:titre ?titre . ?l onto:nomLangue ?langue .
+}
+
+# --- Q11. Pistes de collecte : sites dont la description évoque une légende
+#     mais qui n'ont encore aucun récit rattaché.
+SELECT ?site ?nom ?desc WHERE {
+  ?site onto:nomSite ?nom ; onto:descriptionSite ?desc .
+  FILTER(REGEX(STR(?desc), "légende|sacré|ancêtre", "i"))
+  FILTER NOT EXISTS { ?r onto:estAncreSur ?site }
+}
+
+# --- Q12. Site public : seuls les récits publiables
+SELECT ?r ?titre WHERE { ?r a onto:RecitPubliable ; onto:titre ?titre . }

@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "siteName": "Veillée",
+    "tagline": "Contes et légendes du Burkina Faso",
+    "description": "Parcourez le Burkina Faso sur une carte interactive et écoutez les contes, légendes et récits historiques du pays, en langues nationales."
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "home": "Accueil",
+    "map": "Carte",
+    "stories": "Contes",
+    "timeline": "Frise",
+    "youth": "Jeunesse",
+    "about": "À propos",
+    "search": "Rechercher",
+    "searchShortcut": "Ctrl K",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "skipToContent": "Aller au contenu"
+  },
+  "theme": {
+    "toggle": "Changer de thème",
+    "night": "Mode nuit",
+    "day": "Mode jour"
+  },
+  "home": {
+    "welcome": "Le feu est allumé. Approchez-vous, la veillée commence.",
+    "skipIntro": "Passer l'introduction",
+    "storyOfTheNight": "Le conte de la veillée",
+    "storyOfTheNightEmpty": "Les premiers récits sont en cours de collecte auprès des conteurs. Revenez bientôt.",
+    "exploreMap": "Explorer la carte",
+    "exploreMapHint": "17 régions, des récits ancrés dans leurs lieux",
+    "counters": {
+      "stories": "{count, plural, =0 {aucun récit} one {# récit} other {# récits}}",
+      "languages": "{count, plural, =0 {aucune langue} one {# langue} other {# langues}}",
+      "regions": "{count, plural, =0 {aucune région} one {# région} other {# régions}}"
+    }
+  },
+  "status": {
+    "collecting": "En cours de collecte",
+    "collectingHint": "Ce contenu n'a pas encore été recueilli auprès des communautés.",
+    "draft": "Brouillon",
+    "comingSoon": "Cette section arrive bientôt."
+  },
+  "footer": {
+    "partners": "Partenaires",
+    "partnersText": "Projet universitaire IBAM — Université Joseph Ki-Zerbo.",
+    "license": "Licence des contenus",
+    "licenseText": "Sauf mention contraire, les récits sont publiés sous licence CC BY-NC 4.0, avec le crédit de leurs conteurs.",
+    "storytellers": "Crédits des conteurs",
+    "dataReport": "Rapport sur les données",
+    "ethics": "Charte éthique",
+    "contribute": "Contribuer"
+  },
+  "pages": {
+    "map": "Carte des récits",
+    "stories": "Contes et légendes",
+    "timeline": "Frise historique",
+    "youth": "Espace jeunesse",
+    "about": "À propos",
+    "data": "Rapport sur les données",
+    "ethics": "Charte éthique",
+    "contribute": "Contribuer",
+    "notFound": "Ce sentier ne mène nulle part.",
+    "notFoundHint": "La page demandée n'existe pas ou a été déplacée.",
+    "backHome": "Revenir près du feu"
+  },
+  "storyTypes": {
+    "conte": "Conte",
+    "fable": "Fable",
+    "legende": "Légende",
+    "mythe_fondateur": "Mythe fondateur",
+    "recit_historique": "Récit historique"
+  }
+}

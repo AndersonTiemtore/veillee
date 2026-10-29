@@ -1,0 +1,104 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl:  <http://www.w3.org/2002/07/owl#>.
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#>.
+@prefix onto: <http://www.ibam-ujkz.bf/ontologies/culture#>.
+
+# =====================================================================
+#  Règles Jena (GenericRuleReasoner, mode forward) pour Fuseki
+#  1) Règles existantes de inference.rules
+#  2) Les 13 règles SWRL d'OntoBurkina_Culture, traduites en Jena
+#     (dans le .rdf, swrl:body et swrl:head sont vides — rdf:nil — :
+#      seules les règles écrites ici sont réellement exécutées)
+#  3) Nouvelles règles du module Patrimoine oral
+# =====================================================================
+
+# ---------- 1. Règles existantes ----------
+[rdfsSubClassTrans: (?a rdfs:subClassOf ?b) (?b rdfs:subClassOf ?c) -> (?a rdfs:subClassOf ?c)]
+[rdfsTypeInherit:   (?x rdf:type ?c) (?c rdfs:subClassOf ?d) -> (?x rdf:type ?d)]
+[inverseOf1: (?p owl:inverseOf ?q) (?x ?p ?y) -> (?y ?q ?x)]
+[inverseOf2: (?p owl:inverseOf ?q) (?x ?q ?y) -> (?y ?p ?x)]
+[symmetric:  (?p rdf:type owl:SymmetricProperty) (?x ?p ?y) -> (?y ?p ?x)]
+
+[rule_siteMultiActivites:
+    (?s rdf:type onto:SiteTouristique)
+    (?s onto:proposeActivite ?a1) (?s onto:proposeActivite ?a2) (?s onto:proposeActivite ?a3)
+    notEqual(?a1, ?a2) notEqual(?a2, ?a3) notEqual(?a1, ?a3)
+    -> (?s rdf:type onto:SiteMultiActivites)]
+
+# ---------- 2. Règles SWRL traduites ----------
+[swrl_parle:        (?e rdf:type onto:Ethnie) (?e onto:aPourLangueMaternelle ?l) -> (?e onto:parle ?l)]
+[swrl_habiteTrans:  (?e rdf:type onto:Ethnie) (?e onto:habite ?l1) (?l1 onto:estSitueeDans ?l2) -> (?e onto:habite ?l2)]
+[swrl_instrRegion:  (?i rdf:type onto:Instrument) (?i onto:estLocaliseDans ?l) (?l rdf:type onto:Localite)
+                    (?l onto:estSitueeDans ?r) (?r rdf:type onto:Region) -> (?i onto:estAssocieARegion ?r)]
+[swrl_langueLieu:   (?l rdf:type onto:Langue) (?l onto:estParleePar ?e) (?e onto:habite ?t) -> (?l onto:estParleeDans ?t)]
+[swrl_dansRegion:   (?l rdf:type onto:Localite) (?l onto:estSitueeDans ?p) (?p rdf:type onto:Province)
+                    (?p onto:estSitueeDans ?r) (?r rdf:type onto:Region) -> (?l onto:estDansRegion ?r)]
+[swrl_platViande:   (?p rdf:type onto:Plat) (?p onto:aPourIngredient ?i) (?i rdf:type onto:Viande) -> (?p rdf:type onto:PlatAvecViande)]
+[swrl_platElabore:  (?p rdf:type onto:Plat) (?p onto:aPourRecette ?r) (?r rdf:type onto:Recette)
+                    (?r onto:dureeRecette ?d) greaterThan(?d, 120) -> (?p rdf:type onto:PlatElabore)]
+[swrl_platOrigine:  (?p rdf:type onto:Plat) (?p onto:estAssocieA ?e) (?e rdf:type onto:Ethnie)
+                    (?e onto:habite ?l) (?l rdf:type onto:Localite) -> (?p onto:estOriginaireDe ?l)]
+[swrl_ingrLocal:    (?p rdf:type onto:Plat) (?p onto:estOriginaireDe ?l) (?l rdf:type onto:Localite)
+                    (?p onto:aPourIngredient ?i) (?i onto:estCultiveDans ?l) -> (?p onto:aPourIngredientLocal ?i)]
+[swrl_platRapide:   (?p rdf:type onto:Plat) (?p onto:tempsPreparationPlat ?t) le(?t, 30) -> (?p rdf:type onto:PlatRapide)]
+[swrl_siteRecomm:   (?s rdf:type onto:SiteTouristique) (?s onto:aPourPeriodeFavorable ?p) (?p rdf:type onto:Saison)
+                    (?p onto:estEnCours "true"^^xsd:boolean) -> (?s onto:estRecommandeActuellement "true"^^xsd:boolean)]
+[swrl_siteAccess:   (?s rdf:type onto:SiteTouristique) (?s onto:estAccessibleEnSaisonSeche "true"^^xsd:boolean)
+                    (?sa rdf:type onto:Saison) (?sa onto:estSaisonSeche "true"^^xsd:boolean)
+                    (?sa onto:estEnCours "true"^^xsd:boolean) -> (?s onto:estAccessible "true"^^xsd:boolean)]
+[swrl_activiteLieu: (?s rdf:type onto:SiteTouristique) (?s onto:estSitueDans ?l) (?s onto:proposeActivite ?a)
+                    -> (?l onto:activiteDisponible ?a)]
+
+# ---------- 3. Module Patrimoine oral ----------
+
+# Une localité est « dans » elle-même et dans toutes ses localités englobantes
+# (commune -> province -> région), pour rattacher un récit à sa région.
+[contes_localiteRefl:  (?r onto:seDerouleDans ?l) -> (?r onto:seDerouleDansZone ?l)]
+[contes_localiteTrans: (?r onto:seDerouleDansZone ?l) (?l onto:estSitueeDans ?p) -> (?r onto:seDerouleDansZone ?p)]
+[contes_region:        (?r onto:seDerouleDansZone ?z) (?z rdf:type onto:Region) -> (?r onto:estRaconteDansRegion ?z)]
+
+# NB : 35 localités de sites (ex. loc_bazoule, loc_bobo_dioulasso_dafra) n'ont
+# pas de onto:estSitueeDans. Le script ETL complète ce lien par jointure
+# spatiale (point WKT du site dans le polygone de la région) avant le chargement.
+
+# Un récit ancré sur un site se déroule dans la localité du site.
+[contes_ancrage:  (?r onto:estAncreSur ?s) (?s onto:estSitueDans ?l)
+                  -> (?r onto:seDerouleDans ?l) (?r rdf:type onto:RecitAncreSurSite)]
+
+# Langues disponibles = langues de ses versions.
+[contes_langues:  (?r onto:aPourVersion ?v) (?v onto:estRaconteeEn ?l) -> (?r onto:estDisponibleEnLangue ?l)]
+
+# Récit multilingue : au moins trois langues distinctes.
+[contes_multilingue:
+    (?r onto:estDisponibleEnLangue ?l1) (?r onto:estDisponibleEnLangue ?l2) (?r onto:estDisponibleEnLangue ?l3)
+    notEqual(?l1, ?l2) notEqual(?l2, ?l3) notEqual(?l1, ?l3)
+    -> (?r rdf:type onto:RecitMultilingue)]
+
+# Langue à enregistrer en priorité : langue maternelle de l'ethnie d'origine
+# pour laquelle aucune version n'existe encore.
+[contes_langueManquante:
+    (?r onto:provientDeEthnie ?e) (?e onto:aPourLangueMaternelle ?l)
+    noValue(?r, onto:estDisponibleEnLangue, ?l)
+    -> (?r onto:langueAEnregistrer ?l)]
+
+# Publication : consentement obtenu et récit non restreint.
+[contes_publiable:
+    (?r rdf:type onto:RecitOral) (?r onto:consentementObtenu "true"^^xsd:boolean)
+    (?r onto:estRestreint "false"^^xsd:boolean)
+    -> (?r rdf:type onto:RecitPubliable)]
+
+# Mode « Vivre » : une scène propose un choix.
+[contes_interactif:
+    (?r onto:aPourVersion ?v) (?v onto:aPourScene ?s) (?s onto:proposeChoix ?c)
+    -> (?r rdf:type onto:RecitInteractif)]
+
+# Récits liés : ils partagent un personnage (« Vous aimerez aussi »).
+[contes_lies:
+    (?r1 onto:metEnScene ?p) (?r2 onto:metEnScene ?p) notEqual(?r1, ?r2)
+    -> (?r1 onto:estLieA ?r2)]
+
+# Récit de parenté à plaisanterie : il implique deux ethnies « parentes ».
+[contes_parente:
+    (?r onto:provientDeEthnie ?a) (?r onto:impliqueEthnie ?b) (?a onto:aPourParentePlaisanterie ?b)
+    -> (?r rdf:type onto:RecitDeParentePlaisanterie)]

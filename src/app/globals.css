@@ -1,0 +1,148 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/fonts.css";
+
+@custom-variant dark (&:where([data-theme="nuit"], [data-theme="nuit"] *));
+
+@theme inline {
+  --color-nuit: var(--nuit);
+  --color-indigo: var(--indigo);
+  --color-indigo-clair: var(--indigo-clair);
+  --color-laterite: var(--laterite);
+  --color-laterite-fort: var(--laterite-fort);
+  --color-flamme: var(--flamme);
+  --color-karite: var(--karite);
+  --color-karite-doux: var(--karite-doux);
+  --color-savane: var(--savane);
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-cta: var(--cta-bg);
+  --color-cta-text: var(--cta-text);
+  --color-border: var(--border);
+
+  --font-sans: var(--font-andika), "Andika", system-ui, sans-serif;
+  --font-display: var(--font-gentium), Georgia, serif;
+
+  --text-xs: var(--fs-xs);
+  --text-sm: var(--fs-sm);
+  --text-base: var(--fs-md);
+  --text-lg: var(--fs-lg);
+  --text-xl: var(--fs-xl);
+  --text-2xl: var(--fs-2xl);
+  --text-3xl: var(--fs-3xl);
+
+  --radius-card: var(--r-card);
+  --radius-pill: var(--r-pill);
+  --shadow-glow: var(--glow);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--flamme);
+    color: var(--nuit);
+  }
+}
+
+@layer components {
+  .prose-conte {
+    font-size: var(--fs-md);
+    line-height: var(--leading-conte);
+    max-width: 65ch;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+  }
+
+  .pill {
+    border-radius: var(--r-pill);
+  }
+
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--r-pill);
+    background: var(--cta-bg);
+    color: var(--cta-text);
+    font-weight: 700;
+    transition: box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-cta:hover {
+    box-shadow: var(--glow);
+  }
+}
+
+/* Gentle flicker for the flame that marks the active story. */
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.85;
+    transform: scale(0.97) translateY(0.5px);
+  }
+  70% {
+    opacity: 0.95;
+    transform: scale(1.02);
+  }
+}
+
+.flicker {
+  animation: flicker 2.4s var(--ease-out) infinite;
+  transform-origin: 50% 90%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

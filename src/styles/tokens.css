@@ -1,0 +1,92 @@
+/*
+ * Veillée — design tokens (charte § 5).
+ * Brand colours are fixed; semantic tokens switch between the night theme
+ * (default) and the light theme. Every text/background couple used by the
+ * semantic tokens is checked for WCAG AA in tests/unit/contrast.test.ts.
+ */
+
+:root {
+  /* Brand palette */
+  --nuit: #1b1a2e;
+  --indigo: #2e3a6b;
+  --indigo-clair: #4a5a96;
+  --laterite: #b5562b;
+  --flamme: #e8a33d;
+  --karite: #f4ead5;
+  --karite-doux: #c9bfa8;
+  --savane: #4f7a4a;
+
+  /* Darker variants: laterite and savane only reach 4.1:1 against karite,
+     so text-bearing surfaces use these instead (≥ 5:1). */
+  --laterite-fort: #9c4524;
+  --savane-fort: #3e6139;
+  --encre-douce: #5b5468;
+
+  /* Story type colours (map markers, badges) */
+  --type-conte: var(--flamme);
+  --type-legende: var(--laterite);
+  --type-mythe: #d9784a;
+  --type-historique: var(--karite);
+
+  /* Heading family (self-hosted, src/styles/fonts.css); body family comes
+     from next/font as --font-andika. */
+  --font-gentium: "Gentium Book";
+
+  /* Type scale */
+  --fs-xs: 14px;
+  --fs-sm: 16px;
+  --fs-md: 18px;
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --fs-2xl: 36px;
+  --fs-3xl: 48px;
+  --leading-conte: 1.6;
+
+  /* Shape and motion */
+  --r-card: 12px;
+  --r-pill: 999px;
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --glow: 0 0 0 1px rgb(232 163 61 / 0.35), 0 0 24px rgb(232 163 61 / 0.2);
+}
+
+/* Night theme (default) */
+:root,
+[data-theme="nuit"] {
+  color-scheme: dark;
+  --bg: var(--nuit);
+  --surface: var(--indigo);
+  --surface-hover: var(--indigo-clair);
+  --text: var(--karite);
+  --text-muted: var(--karite-doux);
+  --accent: var(--flamme);
+  --focus: var(--flamme);
+  --cta-bg: var(--laterite-fort);
+  --cta-text: var(--karite);
+  --success-bg: var(--savane-fort);
+  --success-text: var(--karite);
+  --border: rgb(244 234 213 / 0.14);
+  --region-fill: var(--indigo);
+  --region-hover: var(--indigo-clair);
+}
+
+/* Light theme */
+[data-theme="jour"] {
+  color-scheme: light;
+  --bg: var(--karite);
+  --surface: #ebdfc4;
+  --surface-hover: #e0d0ad;
+  --text: var(--nuit);
+  --text-muted: var(--encre-douce);
+  --accent: var(--laterite-fort);
+  --focus: var(--laterite-fort);
+  --cta-bg: var(--laterite-fort);
+  --cta-text: var(--karite);
+  --success-bg: var(--savane-fort);
+  --success-text: var(--karite);
+  --border: rgb(27 26 46 / 0.16);
+  --region-fill: var(--indigo);
+  --region-hover: var(--indigo-clair);
+}

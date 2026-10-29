@@ -1,0 +1,294 @@
+@prefix :        <http://www.ibam-ujkz.bf/ontologies/culture#> .
+@prefix onto:    <http://www.ibam-ujkz.bf/ontologies/culture#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# =====================================================================
+#  OntoBurkina — Module « Patrimoine oral » (Contes, légendes, récits)
+#  Extension de OntoBurkina_Culture : réutilise les classes pivots
+#  Localite / Region, Ethnie, Langue, SiteTouristique, Instrument,
+#  Rythme, Occasion, Periode, Media, Patronyme.
+# =====================================================================
+
+<http://www.ibam-ujkz.bf/ontologies/culture/contes>
+    a owl:Ontology ;
+    owl:imports <http://www.ibam-ujkz.bf/ontologies/culture> ;
+    rdfs:label "OntoBurkina — Patrimoine oral (contes, légendes, récits historiques)"@fr ;
+    rdfs:comment "Module servant de base de connaissances à la plateforme web multimédia et carte interactive des contes et légendes du Burkina Faso."@fr ;
+    owl:versionInfo "0.1" .
+
+# ---------------------------------------------------------------------
+#  Classes
+# ---------------------------------------------------------------------
+
+:RecitOral a owl:Class ;
+    rdfs:label "Récit oral"@fr ;
+    rdfs:comment "Toute œuvre du patrimoine oral : conte, légende, récit historique, mythe fondateur."@fr .
+
+:Conte a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Conte"@fr ;
+    rdfs:comment "Récit de fiction transmis oralement, souvent à visée morale ou éducative."@fr .
+:Legende a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Légende"@fr ;
+    rdfs:comment "Récit merveilleux rattaché à un lieu, un personnage ou un fait réel."@fr .
+:RecitHistorique a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit historique"@fr .
+:MytheFondateur a owl:Class ; rdfs:subClassOf :Legende ;
+    rdfs:label "Mythe fondateur"@fr ;
+    rdfs:comment "Légende expliquant l'origine d'un peuple, d'un royaume ou d'un lignage."@fr .
+:Fable a owl:Class ; rdfs:subClassOf :Conte ;
+    rdfs:label "Fable animalière"@fr .
+
+[] a owl:AllDisjointClasses ; owl:members ( :Conte :Legende :RecitHistorique ) .
+
+# Classes inférées (peuplées par les règles, jamais à la main)
+:RecitAncreSurSite a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit ancré sur un site"@fr .
+:RecitMultilingue a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit multilingue"@fr ;
+    rdfs:comment "Récit disponible dans au moins trois langues."@fr .
+:RecitPubliable a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit publiable"@fr ;
+    rdfs:comment "Consentement obtenu et récit non restreint."@fr .
+:RecitInteractif a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit interactif"@fr ;
+    rdfs:comment "Récit possédant au moins une scène à choix (mode « Vivre »)."@fr .
+:RecitDeParentePlaisanterie a owl:Class ; rdfs:subClassOf :RecitOral ;
+    rdfs:label "Récit de parenté à plaisanterie"@fr .
+
+:Personnage a owl:Class ; rdfs:label "Personnage"@fr .
+:PersonnageHumain a owl:Class ; rdfs:subClassOf :Personnage ; rdfs:label "Personnage humain"@fr .
+:PersonnageAnimal a owl:Class ; rdfs:subClassOf :Personnage ; rdfs:label "Personnage animal"@fr .
+:EtreSurnaturel   a owl:Class ; rdfs:subClassOf :Personnage ; rdfs:label "Être surnaturel"@fr .
+
+:Conteur a owl:Class ; rdfs:label "Conteur / informateur"@fr .
+
+:VersionLinguistique a owl:Class ;
+    rdfs:label "Version linguistique"@fr ;
+    rdfs:comment "Réalisation d'un récit dans une langue donnée (texte, audio, sous-titres)."@fr .
+
+:Scene a owl:Class ;
+    rdfs:label "Scène"@fr ;
+    rdfs:comment "Unité narrative du mode interactif : illustration, extrait audio, texte."@fr .
+:Choix a owl:Class ; rdfs:label "Choix narratif"@fr .
+
+:Theme a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Thème"@fr .
+:Morale a owl:Class ; rdfs:label "Morale"@fr .
+
+:Audio        a owl:Class ; rdfs:subClassOf :Media ; rdfs:label "Audio"@fr .
+:Illustration a owl:Class ; rdfs:subClassOf :Media ; rdfs:label "Illustration"@fr .
+:Animation    a owl:Class ; rdfs:subClassOf :Media ; rdfs:label "Animation (Rive / Lottie)"@fr .
+
+:Epoque a owl:Class ; rdfs:subClassOf :Periode ; rdfs:label "Époque historique"@fr .
+
+# ---------------------------------------------------------------------
+#  Propriétés objet — liens vers l'ontologie Culture existante
+# ---------------------------------------------------------------------
+
+:seDerouleDans a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Localite ;
+    rdfs:label "se déroule dans"@fr .
+:estRaconteDansRegion a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Region ;
+    rdfs:label "est raconté dans la région"@fr ;
+    rdfs:comment "Inférée ; utilisée par la carte interactive."@fr .
+:seDerouleDansZone a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Localite ;
+    rdfs:comment "Inférée : localité du récit et toutes ses localités englobantes."@fr .
+:langueAEnregistrer a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Langue ;
+    rdfs:comment "Inférée : langue de l'ethnie d'origine sans version enregistrée."@fr .
+:estAncreSur a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :SiteTouristique ;
+    rdfs:label "est ancré sur le site"@fr .
+:estRecitDuSite a owl:ObjectProperty ; owl:inverseOf :estAncreSur .
+
+:provientDeEthnie a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Ethnie ;
+    rdfs:label "provient de l'ethnie"@fr .
+:impliqueEthnie a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Ethnie ;
+    rdfs:label "met en scène l'ethnie"@fr .
+:concernePatronyme a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Patronyme ;
+    rdfs:label "concerne le patronyme / lignage"@fr .
+
+:estAccompagneParInstrument a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Instrument ;
+    rdfs:label "est accompagné par l'instrument"@fr .
+:estRythmePar a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Rythme .
+:seRaconteLorsDe a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Occasion ;
+    rdfs:label "se raconte lors de"@fr .
+:seSitueALEpoque a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Periode .
+
+:metEnScene a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Personnage ;
+    rdfs:label "met en scène"@fr .
+:apparaitDans a owl:ObjectProperty ; owl:inverseOf :metEnScene .
+:aPourTheme  a owl:ObjectProperty ; rdfs:domain :RecitOral ; rdfs:range :Theme .
+:aPourMorale a owl:ObjectProperty ; rdfs:domain :RecitOral ; rdfs:range :Morale .
+:estLieA a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :RecitOral ;
+    rdfs:label "est lié à"@fr ; rdfs:comment "Inférée : récits partageant un personnage."@fr .
+
+:aPourVersion a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :VersionLinguistique .
+:estVersionDe a owl:ObjectProperty ; owl:inverseOf :aPourVersion .
+:estRaconteeEn a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain :VersionLinguistique ; rdfs:range :Langue ;
+    rdfs:label "est racontée en"@fr .
+:estDisponibleEnLangue a owl:ObjectProperty ;
+    rdfs:domain :RecitOral ; rdfs:range :Langue ;
+    rdfs:comment "Inférée à partir des versions."@fr .
+:estRacontePar a owl:ObjectProperty ;
+    rdfs:domain :VersionLinguistique ; rdfs:range :Conteur .
+:conteurOriginaireDe a owl:ObjectProperty ;
+    rdfs:domain :Conteur ; rdfs:range :Localite .
+
+:aPourScene a owl:ObjectProperty ; rdfs:domain :VersionLinguistique ; rdfs:range :Scene .
+:sceneSuivante a owl:ObjectProperty ; rdfs:domain :Scene ; rdfs:range :Scene .
+:proposeChoix a owl:ObjectProperty ; rdfs:domain :Scene ; rdfs:range :Choix .
+:choixMeneA a owl:ObjectProperty ; rdfs:domain :Choix ; rdfs:range :Scene .
+:aPourIllustration a owl:ObjectProperty ; rdfs:range :Illustration .
+:aPourAnimation    a owl:ObjectProperty ; rdfs:range :Animation .
+:aPourAudio        a owl:ObjectProperty ; rdfs:range :Audio .
+
+# ---------------------------------------------------------------------
+#  Propriétés de données
+# ---------------------------------------------------------------------
+
+:titre a owl:DatatypeProperty ; rdfs:range rdf:langString .
+:slug a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain :RecitOral ; rdfs:range xsd:string ;
+    rdfs:comment "Identifiant d'URL : /contes/{slug}."@fr .
+:resume a owl:DatatypeProperty ; rdfs:range rdf:langString .
+:texteIntegral a owl:DatatypeProperty ; rdfs:domain :VersionLinguistique ; rdfs:range xsd:string .
+:urlAudio a owl:DatatypeProperty ; rdfs:range xsd:anyURI .
+:urlSousTitres a owl:DatatypeProperty ; rdfs:domain :VersionLinguistique ; rdfs:range xsd:anyURI ;
+    rdfs:comment "Fichier WebVTT synchronisé avec l'audio."@fr .
+:dureeSecondes a owl:DatatypeProperty ; rdfs:range xsd:nonNegativeInteger .
+:ordreScene a owl:DatatypeProperty ; rdfs:domain :Scene ; rdfs:range xsd:positiveInteger .
+:debutAudio a owl:DatatypeProperty ; rdfs:domain :Scene ; rdfs:range xsd:decimal .
+:finAudio   a owl:DatatypeProperty ; rdfs:domain :Scene ; rdfs:range xsd:decimal .
+:texteScene a owl:DatatypeProperty ; rdfs:domain :Scene ; rdfs:range rdf:langString .
+:libelleChoix a owl:DatatypeProperty ; rdfs:domain :Choix ; rdfs:range rdf:langString .
+:estVraieFin a owl:DatatypeProperty ; rdfs:domain :Choix ; rdfs:range xsd:boolean .
+:publicCible a owl:DatatypeProperty ; rdfs:domain :RecitOral ; rdfs:range xsd:string ;
+    rdfs:comment "enfant | tout_public | adulte"@fr .
+:statutCollecte a owl:DatatypeProperty ; rdfs:domain :RecitOral ; rdfs:range xsd:string ;
+    rdfs:comment "a_collecter | enregistre | transcrit | traduit | illustre | publie"@fr .
+:consentementObtenu a owl:DatatypeProperty ; rdfs:range xsd:boolean .
+:estRestreint a owl:DatatypeProperty ; rdfs:domain :RecitOral ; rdfs:range xsd:boolean ;
+    rdfs:comment "Vrai si la communauté ne souhaite pas une diffusion publique (récit sacré)."@fr .
+:dateCollecte a owl:DatatypeProperty ; rdfs:range xsd:date .
+:nomConteur a owl:DatatypeProperty ; rdfs:domain :Conteur ; rdfs:range xsd:string .
+:nomPersonnage a owl:DatatypeProperty ; rdfs:domain :Personnage ; rdfs:range rdf:langString .
+:enonceMorale a owl:DatatypeProperty ; rdfs:domain :Morale ; rdfs:range rdf:langString .
+# dcterms:license et dcterms:source sont réutilisés pour les droits et la provenance.
+
+# ---------------------------------------------------------------------
+#  Vocabulaires contrôlés
+# ---------------------------------------------------------------------
+
+:occ_veillee_contes a owl:NamedIndividual, :Occasion ;
+    :nomOccasion "Veillée de contes" ; rdfs:label "Veillée de contes"@fr .
+
+:theme_origine a owl:NamedIndividual, :Theme ; skos:prefLabel "Origines et fondations"@fr .
+:theme_courage a owl:NamedIndividual, :Theme ; skos:prefLabel "Courage"@fr .
+:theme_ruse    a owl:NamedIndividual, :Theme ; skos:prefLabel "Ruse et intelligence"@fr .
+:theme_sacre   a owl:NamedIndividual, :Theme ; skos:prefLabel "Lieux et animaux sacrés"@fr .
+:theme_ancetres a owl:NamedIndividual, :Theme ; skos:prefLabel "Ancêtres"@fr .
+
+# =====================================================================
+#  Individus d'exemple (jeu pilote) — à compléter lors de la collecte
+# =====================================================================
+
+# --- 1. Mythe fondateur : Yennenga ----------------------------------
+:recit_legende_yennenga a owl:NamedIndividual, :MytheFondateur ;
+    :titre "Yennenga, la cavalière"@fr ;
+    :slug "yennenga-la-cavaliere" ;
+    :resume "Princesse guerrière, Yennenga quitte le royaume de son père sur un étalon. Sa rencontre avec le chasseur Rialé donne naissance à Ouédraogo, ancêtre des Mossi."@fr ;
+    :provientDeEthnie onto:ethnie_mossi ;
+    :seDerouleDans onto:loc_tenkodogo ;
+    :metEnScene :perso_yennenga, :perso_riale, :perso_ouedraogo, :perso_etalon ;
+    :aPourTheme :theme_origine, :theme_courage ;
+    :estAccompagneParInstrument onto:instr_bendre_ou_bara ;
+    :seRaconteLorsDe :occ_veillee_contes ;
+    :aPourVersion :v_yennenga_fr, :v_yennenga_mos ;
+    :publicCible "tout_public" ;
+    :statutCollecte "a_collecter" ;
+    :consentementObtenu false ;
+    :estRestreint false .
+
+:perso_yennenga a owl:NamedIndividual, :PersonnageHumain ; :nomPersonnage "Yennenga"@fr .
+:perso_riale    a owl:NamedIndividual, :PersonnageHumain ; :nomPersonnage "Rialé"@fr .
+:perso_ouedraogo a owl:NamedIndividual, :PersonnageHumain ; :nomPersonnage "Ouédraogo"@fr ;
+    rdfs:comment "Lien possible avec onto:patronyme_ouedraogo s'il est ajouté à l'ontologie."@fr .
+:perso_etalon   a owl:NamedIndividual, :PersonnageAnimal ; :nomPersonnage "L'étalon"@fr .
+
+:v_yennenga_fr a owl:NamedIndividual, :VersionLinguistique ;
+    :estRaconteeEn onto:langue_francais ;
+    :aPourScene :sc_yen_1, :sc_yen_2, :sc_yen_3 .
+:v_yennenga_mos a owl:NamedIndividual, :VersionLinguistique ;
+    :estRaconteeEn onto:langue_moore .
+
+:sc_yen_1 a owl:NamedIndividual, :Scene ; :ordreScene 1 ;
+    :texteScene "La princesse refuse de rester au palais : elle veut chevaucher."@fr ;
+    :sceneSuivante :sc_yen_2 .
+:sc_yen_2 a owl:NamedIndividual, :Scene ; :ordreScene 2 ;
+    :texteScene "Un soir, l'étalon s'emballe et l'emporte loin vers le nord."@fr ;
+    :proposeChoix :ch_yen_suivre, :ch_yen_retour .
+:sc_yen_3 a owl:NamedIndividual, :Scene ; :ordreScene 3 ;
+    :texteScene "Au cœur de la forêt, elle rencontre le chasseur Rialé."@fr .
+:ch_yen_suivre a owl:NamedIndividual, :Choix ;
+    :libelleChoix "Laisser l'étalon la guider"@fr ; :estVraieFin true ; :choixMeneA :sc_yen_3 .
+:ch_yen_retour a owl:NamedIndividual, :Choix ;
+    :libelleChoix "Faire demi-tour vers le palais"@fr ; :estVraieFin false ; :choixMeneA :sc_yen_1 .
+
+# --- 2. Légendes ancrées sur des sites déjà présents dans l'ontologie
+:recit_crocodiles_bazoule a owl:NamedIndividual, :Legende ;
+    :titre "Les crocodiles tombés du ciel"@fr ;
+    :slug "crocodiles-de-bazoule" ;
+    :resume "D'après la tradition, les crocodiles de la mare de Bazoulé seraient arrivés avec la pluie il y a plusieurs siècles."@fr ;
+    :estAncreSur onto:site_mare_aux_crocodiles_sacres_de_bazoule ;
+    :aPourTheme :theme_sacre ;
+    :statutCollecte "a_collecter" ; :consentementObtenu false ; :estRestreint false .
+
+:recit_crocodiles_sabou a owl:NamedIndividual, :Legende ;
+    :titre "L'ancêtre Kaboré et les crocodiles de Sabou"@fr ;
+    :slug "crocodiles-de-sabou" ;
+    :estAncreSur onto:site_mare_aux_crocodiles_sacres_de_sabou ;
+    :concernePatronyme onto:patronyme_kabore ;
+    :provientDeEthnie onto:ethnie_mossi ;
+    :aPourTheme :theme_sacre, :theme_ancetres ;
+    :statutCollecte "a_collecter" ; :consentementObtenu false ; :estRestreint false .
+
+:recit_silures_dafra a owl:NamedIndividual, :Legende ;
+    :titre "Les silures de Dafra, esprits des ancêtres"@fr ;
+    :slug "silures-de-dafra" ;
+    :estAncreSur onto:site_mare_aux_silures_sacres_de_dafra ;
+    :provientDeEthnie onto:ethnie_bobo ;
+    :aPourTheme :theme_sacre, :theme_ancetres ;
+    :estAccompagneParInstrument onto:instr_balafon ;
+    :statutCollecte "a_collecter" ; :consentementObtenu false ;
+    :estRestreint true ;
+    rdfs:comment "Lieu de culte : vérifier avec la communauté ce qui peut être diffusé."@fr .
+
+# --- 3. Fable de veillée -------------------------------------------
+:conte_lievre_hyene a owl:NamedIndividual, :Fable ;
+    :titre "Le lièvre et l'hyène"@fr ;
+    :slug "le-lievre-et-l-hyene" ;
+    :metEnScene :perso_lievre, :perso_hyene ;
+    :aPourTheme :theme_ruse ;
+    :seRaconteLorsDe :occ_veillee_contes ;
+    :publicCible "enfant" ;
+    :statutCollecte "a_collecter" ; :consentementObtenu false ; :estRestreint false .
+:perso_lievre a owl:NamedIndividual, :PersonnageAnimal ; :nomPersonnage "Le lièvre"@fr .
+:perso_hyene  a owl:NamedIndividual, :PersonnageAnimal ; :nomPersonnage "L'hyène"@fr .
