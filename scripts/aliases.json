@@ -1,0 +1,11 @@
+{
+  "$comment": "Duplicate individuals merged at load time: every IRI on the left is rewritten to the canonical IRI on the right (local names in the onto: namespace).",
+  "loc_bobo_dioulaso": "loc_bobo_dioulasso",
+  "loc_bobo_dioulasso_import": "loc_bobo_dioulasso",
+  "loc_bobo_dioulasso_kossi": "loc_bobo_dioulasso",
+  "ethnie_moaga": "ethnie_mossi",
+  "ethnie_moore": "ethnie_mossi",
+  "ethnie_fulfulde": "ethnie_peul",
+  "ethnie_bwa": "ethnie_bwaba",
+  "ethnie_bwaba_bwamu": "ethnie_bwaba"
+}

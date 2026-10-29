@@ -1,0 +1,15 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q5. Fiche conte : tout ce qu'il faut pour la page /contes/{slug}
+SELECT ?r ?titre ?resume ?ethnie ?langue ?audio ?vtt ?instrument ?site WHERE {
+  ?r onto:slug "yennenga-la-cavaliere" ; onto:titre ?titre .
+  OPTIONAL { ?r onto:resume ?resume }
+  OPTIONAL { ?r onto:provientDeEthnie/onto:nomEthnie ?ethnie }
+  OPTIONAL { ?r onto:aPourVersion ?v . ?v onto:estRaconteeEn/onto:nomLangue ?langue .
+             OPTIONAL { ?v onto:urlAudio ?audio } OPTIONAL { ?v onto:urlSousTitres ?vtt } }
+  OPTIONAL { ?r onto:estAccompagneParInstrument/onto:nomInstrument ?instrument }
+  OPTIONAL { ?r onto:estAncreSur/onto:nomSite ?site }
+}

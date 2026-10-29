@@ -1,0 +1,11 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q2. Carte : marqueurs des récits ancrés sur un site (point WKT)
+SELECT ?r ?titre ?slug ?type ?wkt WHERE {
+  ?r onto:estAncreSur ?site ; onto:titre ?titre ; onto:slug ?slug ; a ?type .
+  ?site onto:geometrieWKT ?wkt .
+  FILTER(?type IN (onto:Conte, onto:Fable, onto:Legende, onto:MytheFondateur, onto:RecitHistorique))
+}

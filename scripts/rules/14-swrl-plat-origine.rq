@@ -1,0 +1,15 @@
+# rule: swrl_platOrigine
+# stratum: 1
+# A dish originates where its associated ethnic group lives.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?p onto:estOriginaireDe ?l }
+WHERE {
+  ?p a onto:Plat ; onto:estAssocieA ?e .
+  ?e a onto:Ethnie ; onto:habite ?l .
+  ?l a onto:Localite .
+}

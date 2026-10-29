@@ -1,0 +1,11 @@
+# rule: swrl_habiteTrans
+# stratum: 1
+# Living in a locality means living in the enclosing ones.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?e onto:habite ?l2 }
+WHERE { ?e a onto:Ethnie ; onto:habite ?l1 . ?l1 onto:estSitueeDans ?l2 }

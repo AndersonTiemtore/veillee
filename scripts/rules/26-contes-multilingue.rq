@@ -1,0 +1,14 @@
+# rule: contes_multilingue
+# stratum: 1
+# Multilingual story: at least three distinct languages.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?r a onto:RecitMultilingue }
+WHERE {
+  ?r onto:estDisponibleEnLangue ?l1, ?l2, ?l3 .
+  FILTER(?l1 != ?l2 && ?l2 != ?l3 && ?l1 != ?l3)
+}

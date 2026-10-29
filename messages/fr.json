@@ -65,6 +65,36 @@
     "notFoundHint": "La page demandée n'existe pas ou a été déplacée.",
     "backHome": "Revenir près du feu"
   },
+  "dataReport": {
+    "intro": "Les données de Veillée proviennent de l'ontologie OntoBurkina. Elles sont corrigées et enrichies automatiquement à chaque mise à jour du site ; les fichiers sources ne sont jamais modifiés. Ce rapport rend compte de ces corrections.",
+    "generatedAt": "Rapport généré le {date}",
+    "triples": "Triplets RDF",
+    "triplesValue": "{source} dans l'ontologie, {after} après inférence",
+    "inference": "Inférence",
+    "inferenceValue": "{added} faits déduits par {rules} règles SPARQL, point fixe atteint en {passes} passes",
+    "aliases": "Doublons fusionnés",
+    "aliasesValue": "{count} individus en double ramenés à leur forme canonique",
+    "spatial": "Localités sans rattachement administratif",
+    "spatialValue": "{total} localités de sites n'avaient pas de région ; {joined} localités ont été rattachées par jointure spatiale (le point du site dans le contour de la région)",
+    "unresolved": "Localités non résolues",
+    "ethnies": "Ethnies sans nom",
+    "ethniesValue": "{count} ethnies sans « nomEthnie » : le libellé RDF est utilisé ; {generic} entrées génériques ignorées",
+    "media": "Médias externes masqués",
+    "mediaValue": "{count} liens vers des images dont les droits ne sont pas établis (Bing, Wikipédia…) ne sont jamais affichés",
+    "stories": "Récits",
+    "storiesValue": "{total} récits, dont {publiables} publiables et {restreints} restreints à la demande des communautés",
+    "toRecord": "Langues maternelles à enregistrer",
+    "toRecordValue": "{count} versions en langue maternelle restent à enregistrer",
+    "status": "Statut de collecte",
+    "statuses": {
+      "a_collecter": "À collecter",
+      "enregistre": "Enregistré",
+      "transcrit": "Transcrit",
+      "traduit": "Traduit",
+      "illustre": "Illustré",
+      "publie": "Publié"
+    }
+  },
   "storyTypes": {
     "conte": "Conte",
     "fable": "Fable",

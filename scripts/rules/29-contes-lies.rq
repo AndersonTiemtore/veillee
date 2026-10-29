@@ -1,0 +1,11 @@
+# rule: contes_lies
+# stratum: 1
+# Related stories share a character.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?r1 onto:estLieA ?r2 }
+WHERE { ?r1 onto:metEnScene ?p . ?r2 onto:metEnScene ?p . FILTER(?r1 != ?r2) }

@@ -1,0 +1,12 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q11. Pistes de collecte : sites dont la description évoque une légende
+#     mais qui n'ont encore aucun récit rattaché.
+SELECT ?site ?nom ?desc WHERE {
+  ?site onto:nomSite ?nom ; onto:descriptionSite ?desc .
+  FILTER(REGEX(STR(?desc), "légende|sacré|ancêtre", "i"))
+  FILTER NOT EXISTS { ?r onto:estAncreSur ?site }
+}

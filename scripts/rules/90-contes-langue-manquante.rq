@@ -1,0 +1,14 @@
+# rule: contes_langueManquante
+# stratum: 2
+# Non-monotonic (noValue): runs once, after stratum 1 reached its fixed point.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?r onto:langueAEnregistrer ?l }
+WHERE {
+  ?r onto:provientDeEthnie ?e . ?e onto:aPourLangueMaternelle ?l .
+  FILTER NOT EXISTS { ?r onto:estDisponibleEnLangue ?l }
+}

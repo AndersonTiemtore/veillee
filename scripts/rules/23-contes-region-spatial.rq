@@ -1,0 +1,12 @@
+# rule: (pipeline) contes_regionSpatial
+# stratum: 1
+# Not in the Jena file. Bridges the spatial join: localities without a parent get
+# onto:estDansRegion from build-data.ts, which contes_region cannot see.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?r onto:estRaconteDansRegion ?z }
+WHERE { ?r onto:seDerouleDansZone ?l . ?l onto:estDansRegion ?z . ?z a onto:Region }

@@ -1,0 +1,15 @@
+# rule: swrl_platElabore
+# stratum: 1
+# Dish whose recipe takes more than 120 minutes.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?p a onto:PlatElabore }
+WHERE {
+  ?p a onto:Plat ; onto:aPourRecette ?r .
+  ?r a onto:Recette ; onto:dureeRecette ?d .
+  FILTER(?d > 120)
+}

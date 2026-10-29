@@ -1,0 +1,15 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q8. Recommandations « Vous aimerez aussi »
+SELECT DISTINCT ?autre ?titre WHERE {
+  { onto:recit_legende_yennenga onto:estLieA ?autre }
+  UNION
+  { onto:recit_legende_yennenga onto:aPourTheme ?t . ?autre onto:aPourTheme ?t }
+  UNION
+  { onto:recit_legende_yennenga onto:estRaconteDansRegion ?reg . ?autre onto:estRaconteDansRegion ?reg }
+  ?autre onto:titre ?titre .
+  FILTER(?autre != onto:recit_legende_yennenga)
+}

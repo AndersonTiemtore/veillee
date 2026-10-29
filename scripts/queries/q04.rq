@@ -1,0 +1,24 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q4. Fiche région : contexte culturel (panneau « Autour de ce conte »)
+#     Remplacer onto:loc_nakambe par la région affichée.
+SELECT ?categorie ?item ?label WHERE {
+  VALUES ?region { onto:loc_nakambe }
+  {
+    BIND("Langues parlées" AS ?categorie)
+    ?item onto:estParleeDans ?region ; onto:nomLangue ?label .
+  } UNION {
+    BIND("Ethnies" AS ?categorie)
+    ?item onto:habite ?region ; onto:nomEthnie ?label .
+  } UNION {
+    BIND("Sites à visiter" AS ?categorie)
+    ?item onto:estSitueDans ?l ; onto:nomSite ?label .
+    ?l onto:estDansRegion ?region .
+  } UNION {
+    BIND("Instruments" AS ?categorie)
+    ?item onto:estAssocieARegion ?region ; onto:nomInstrument ?label .
+  }
+}

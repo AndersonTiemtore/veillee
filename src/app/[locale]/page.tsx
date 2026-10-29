@@ -5,17 +5,30 @@ import { use } from "react";
 import { PatternDivider } from "@/components/ui/Pattern";
 import { Flamme } from "@/components/ui/Pictogram";
 import { Link } from "@/i18n/navigation";
+import { counters } from "@/lib/data";
 
 export default function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("home");
+  const count = counters();
 
   return (
     <div className="mx-auto max-w-6xl px-4">
       <section className="flex flex-col items-center py-16 text-center sm:py-24">
         <Flamme aria-hidden className="flicker mb-6 text-flamme" width={96} height={96} />
         <h1 className="max-w-2xl text-2xl font-bold sm:text-3xl">{t("welcome")}</h1>
+        <ul className="mt-8 flex flex-wrap justify-center gap-3 text-muted">
+          <li className="pill border border-border px-4 py-1">
+            {t("counters.stories", { count: count.recits })}
+          </li>
+          <li className="pill border border-border px-4 py-1">
+            {t("counters.languages", { count: count.langues })}
+          </li>
+          <li className="pill border border-border px-4 py-1">
+            {t("counters.regions", { count: count.regions })}
+          </li>
+        </ul>
       </section>
 
       <PatternDivider />

@@ -1,0 +1,15 @@
+# rule: swrl_instrRegion
+# stratum: 1
+# An instrument located in a locality is associated with its region.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?i onto:estAssocieARegion ?r }
+WHERE {
+  ?i a onto:Instrument ; onto:estLocaliseDans ?l .
+  ?l a onto:Localite ; onto:estSitueeDans ?r .
+  ?r a onto:Region .
+}

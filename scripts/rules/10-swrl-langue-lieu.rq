@@ -1,0 +1,11 @@
+# rule: swrl_langueLieu
+# stratum: 1
+# A language is spoken where its speakers live.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?l onto:estParleeDans ?t }
+WHERE { ?l a onto:Langue ; onto:estParleePar ?e . ?e onto:habite ?t }

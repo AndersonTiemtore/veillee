@@ -4,29 +4,29 @@
 
 ## Préalables
 - [x] Lire `ontology/` (Contes.ttl, inference_contes.rules, requetes_plateforme.sparql)
-- [ ] **Bloquant phase 2 :** obtenir `ontology/OntoBurkina_Culture.rdf` (absent du dossier)
+- [x] Obtenir `ontology/OntoBurkina_Culture.rdf`
 - [x] Télécharger COD-AB BFA (HDX) → `data/raw/cod-ab/` — admin1 contient déjà les 17 nouvelles régions (BF47…BF64, valid_on 2025-08-01) : pas de dissolve nécessaire
 
 ## Phase 1 — Socle
-- [ ] Next.js (App Router) + TypeScript strict, ESLint, Prettier, Vitest, Playwright
-- [ ] Tailwind v4 + `src/styles/tokens.css` (charte § 5), mode clair/sombre
-- [ ] Polices Gentium Book Plus / Andika (`next/font/google`)
-- [ ] next-intl : `/[locale]`, `fr` par défaut, `mos`/`dyu`/`fuh` en repli sur `fr`
-- [ ] Layout : en-tête, pied de page, bascule de thème, emplacement du mini-lecteur
-- [ ] Page d'accueil statique
-- [ ] Tests : contraste WCAG AA de tous les couples, caractères ɛ ɩ ʋ ɓ ɗ ŋ ɲ ƴ ã ẽ ĩ õ ũ (Playwright + `document.fonts.check`)
-- [ ] Workflow GitHub Actions (lint, typecheck, test, build)
-- [ ] Commit `feat(socle): …`
+- [x] Next.js (App Router) + TypeScript strict, ESLint, Prettier, Vitest, Playwright
+- [x] Tailwind v4 + `src/styles/tokens.css` (charte § 5), mode clair/sombre — variantes `--laterite-fort`/`--savane-fort` pour atteindre AA
+- [x] Polices : Andika (`next/font/google`) ; Gentium Book auto-hébergé depuis SIL (la version Google n'a pas ɛ ɩ ʋ ɓ ɗ ɲ)
+- [x] next-intl : `/[locale]`, `fr` par défaut, `mos`/`dyu`/`fuh` en repli sur `fr`
+- [x] Layout : en-tête, pied de page, bascule de thème (mini-lecteur : phase 4)
+- [x] Page d'accueil statique
+- [x] Tests : contraste WCAG AA de tous les couples, caractères ɛ ɩ ʋ ɓ ɗ ŋ ɲ ƴ ã ẽ ĩ õ ũ (Playwright + `document.fonts.check`)
+- [x] Workflow GitHub Actions (lint, typecheck, test, build)
+- [x] Commit `feat(socle): …`
 
 ## Phase 2 — Pipeline de données
-- [ ] `scripts/build-regions.ts` : COD-AB admin1 → simplification ~5 % → `data/boundaries/regions.geojson` (< 300 Ko, 17 entités)
-- [ ] `scripts/aliases.json` + fusion des doublons au chargement
-- [ ] `scripts/rules/*.rq` : toutes les règles de `inference_contes.rules` en SPARQL UPDATE
-- [ ] `scripts/queries/*.rq` : Q1 à Q12
-- [ ] `scripts/build-data.ts` : Oxigraph, jointure spatiale (`estDansRegion`), point fixe, export JSON/GeoJSON, `graph.nt`
-- [ ] `src/data/schemas.ts` (Zod) ; échec du build si invalide
-- [ ] `data-quality.json`
-- [ ] Tests Vitest : une règle = un test sur mini-graphe ; Yennenga → Nakambé, Sabou → Nando, Bazoulé/Dafra régionalisés, Yennenga interactif, 17 régions
+- [x] `scripts/build-regions.ts` : COD-AB admin1 → simplification ~5 % → `data/boundaries/regions.geojson` (261 Ko, 17 entités)
+- [x] `scripts/aliases.json` + fusion des doublons au chargement (8 fusions)
+- [x] `scripts/rules/*.rq` : 30 règles Jena + 1 règle de raccord spatial, en 2 strates (négation après le point fixe)
+- [x] `scripts/queries/*.rq` : Q1 à Q12
+- [x] `scripts/build-data.ts` : Oxigraph, jointure spatiale (`estDansRegion`, 46 localités), point fixe, export JSON/GeoJSON, `graph.nt`
+- [x] `src/data/schemas.ts` (Zod) ; échec du build si invalide
+- [x] `data-quality.json` + page `/a-propos/donnees`
+- [x] Tests Vitest : une règle = un test sur mini-graphe ; Yennenga → Nakambé, Sabou → Nando, Bazoulé/Dafra régionalisés, Yennenga interactif, 17 régions
 
 ## Phase 3 — Carte
 - [ ] `/carte` : polygones, survol/infobulle, `flyTo`, panneau/tiroir, marqueurs + clusters, filtres dans l'URL

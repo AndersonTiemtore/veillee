@@ -1,0 +1,12 @@
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# --- Q6. Mode « Vivre » : scènes et choix d'une version
+SELECT ?ordre ?texte ?choix ?libelle ?vraieFin ?cible WHERE {
+  onto:v_yennenga_fr onto:aPourScene ?s .
+  ?s onto:ordreScene ?ordre ; onto:texteScene ?texte .
+  OPTIONAL { ?s onto:proposeChoix ?choix . ?choix onto:libelleChoix ?libelle ;
+             onto:estVraieFin ?vraieFin ; onto:choixMeneA ?cible }
+} ORDER BY ?ordre

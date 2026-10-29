@@ -1,0 +1,15 @@
+# rule: rule_siteMultiActivites
+# stratum: 1
+# A site offering at least three distinct activities.
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX onto: <http://www.ibam-ujkz.bf/ontologies/culture#>
+
+INSERT { ?s a onto:SiteMultiActivites }
+WHERE {
+  ?s a onto:SiteTouristique ;
+     onto:proposeActivite ?a1, ?a2, ?a3 .
+  FILTER(?a1 != ?a2 && ?a2 != ?a3 && ?a1 != ?a3)
+}
