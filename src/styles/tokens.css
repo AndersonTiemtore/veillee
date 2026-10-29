@@ -1,8 +1,9 @@
 /*
  * Veillée — design tokens (charte § 5).
- * Brand colours are fixed; semantic tokens switch between the night theme
- * (default) and the light theme. Every text/background couple used by the
- * semantic tokens is checked for WCAG AA in tests/unit/contrast.test.ts.
+ * Brand colours are fixed; semantic tokens switch between the light "terre"
+ * theme (default) and the night "veillée" theme. Every text/background couple
+ * used by the semantic tokens is checked for WCAG AA in
+ * tests/unit/contrast.test.ts.
  */
 
 :root {
@@ -22,11 +23,14 @@
   --savane-fort: #3e6139;
   --encre-douce: #5b5468;
 
-  /* Story type colours (map markers, badges) */
-  --type-conte: var(--flamme);
-  --type-legende: var(--laterite);
-  --type-mythe: #d9784a;
-  --type-historique: var(--karite);
+  /* Earth palette (light theme, map) */
+  --sable: #faf3e6;
+  --sable-fonce: #f1e4c8;
+  --terre: #2a1d14;
+  --terre-douce: #6b5a4a;
+  --ocre: #d08a2c;
+  --or: #e3b448;
+
 
   /* Heading family (self-hosted, src/styles/fonts.css); body family comes
      from next/font as --font-andika. */
@@ -52,8 +56,34 @@
   --glow: 0 0 0 1px rgb(232 163 61 / 0.35), 0 0 24px rgb(232 163 61 / 0.2);
 }
 
-/* Night theme (default) */
+/* Light "terre" theme (default) */
 :root,
+[data-theme="jour"] {
+  color-scheme: light;
+  --bg: var(--sable);
+  --surface: #fffcf5;
+  --surface-hover: var(--sable-fonce);
+  --text: var(--terre);
+  --text-muted: var(--terre-douce);
+  --accent: var(--laterite-fort);
+  --focus: var(--laterite-fort);
+  --cta-bg: var(--terre);
+  --cta-text: var(--sable);
+  --success-bg: var(--savane-fort);
+  --success-text: var(--karite);
+  --border: rgb(42 29 20 / 0.14);
+  --shadow-float: 0 8px 28px rgb(42 29 20 / 0.12);
+  --map-region: var(--or);
+  --map-region-active: var(--laterite);
+  --map-line: var(--terre);
+  /* Story type colours (markers, badges); must stand out on sand and gold. */
+  --type-conte: var(--indigo);
+  --type-legende: var(--laterite);
+  --type-mythe: var(--savane);
+  --type-historique: var(--terre);
+}
+
+/* Night "veillée" theme */
 [data-theme="nuit"] {
   color-scheme: dark;
   --bg: var(--nuit);
@@ -68,25 +98,12 @@
   --success-bg: var(--savane-fort);
   --success-text: var(--karite);
   --border: rgb(244 234 213 / 0.14);
-  --region-fill: var(--indigo);
-  --region-hover: var(--indigo-clair);
-}
-
-/* Light theme */
-[data-theme="jour"] {
-  color-scheme: light;
-  --bg: var(--karite);
-  --surface: #ebdfc4;
-  --surface-hover: #e0d0ad;
-  --text: var(--nuit);
-  --text-muted: var(--encre-douce);
-  --accent: var(--laterite-fort);
-  --focus: var(--laterite-fort);
-  --cta-bg: var(--laterite-fort);
-  --cta-text: var(--karite);
-  --success-bg: var(--savane-fort);
-  --success-text: var(--karite);
-  --border: rgb(27 26 46 / 0.16);
-  --region-fill: var(--indigo);
-  --region-hover: var(--indigo-clair);
+  --shadow-float: 0 8px 28px rgb(0 0 0 / 0.35);
+  --map-region: var(--indigo);
+  --map-region-active: var(--flamme);
+  --map-line: var(--karite);
+  --type-conte: var(--flamme);
+  --type-legende: var(--laterite);
+  --type-mythe: #d9784a;
+  --type-historique: var(--karite);
 }

@@ -2,13 +2,18 @@ import { PUBLICS, RECIT_TYPES, type PublicCible, type RecitType } from "@/data/s
 
 /** Filters shared by the map and the catalogue; mirrored in the URL. */
 export interface Filters {
+  q?: string;
   type?: RecitType;
   langue?: string;
   theme?: string;
   public?: PublicCible;
 }
 
-export const FILTER_KEYS = ["type", "langue", "theme", "public"] as const;
+export const FILTER_KEYS = ["q", "type", "langue", "theme", "public"] as const;
+
+/** Lower-case, accent-free form used for title search ("Rialé" ~ "riale"). */
+export const normalize = (s: string) =>
+  s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
 
 type Params = { get(name: string): string | null };
 
@@ -16,6 +21,7 @@ export function parseFilters(params: Params): Filters {
   const type = params.get("type");
   const pub = params.get("public");
   return {
+    q: params.get("q")?.slice(0, 80) || undefined,
     type: RECIT_TYPES.includes(type as RecitType) ? (type as RecitType) : undefined,
     langue: params.get("langue") || undefined,
     theme: params.get("theme") || undefined,
@@ -35,6 +41,7 @@ export function filtersToQuery(filters: Filters): string {
 
 /** Minimal shape needed to filter a story (works on Recit and GeoJSON properties). */
 export interface Filterable {
+  titre: string;
   type: RecitType;
   langueIds: string[];
   themeIds: string[];
@@ -43,6 +50,7 @@ export interface Filterable {
 
 export function matches(item: Filterable, f: Filters): boolean {
   return (
+    (!f.q || normalize(item.titre).includes(normalize(f.q))) &&
     // A fable is a kind of conte: filtering on "conte" includes fables.
     (!f.type || item.type === f.type || (f.type === "conte" && item.type === "fable")) &&
     (!f.langue || item.langueIds.includes(f.langue)) &&

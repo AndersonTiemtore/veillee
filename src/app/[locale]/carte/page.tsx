@@ -18,14 +18,14 @@ export default async function MapPage({ params }: PageProps<"/[locale]/carte">) 
   const t = await getTranslations("map");
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-2 text-2xl font-bold sm:text-3xl">{t("title")}</h1>
-      <p className="prose-conte mb-6 text-muted">{t("intro")}</p>
+    <>
+      <h1 className="sr-only">{t("title")}</h1>
+      <p className="sr-only">{t("intro")}</p>
       {/* Filters and the selected region live in the URL (useSearchParams). */}
       <Suspense fallback={<StaticRegionList />}>
         <MapExplorer regions={mapRegions()} stories={mapStories()} options={filterOptions()} />
       </Suspense>
-    </div>
+    </>
   );
 }
 
@@ -33,7 +33,7 @@ export default async function MapPage({ params }: PageProps<"/[locale]/carte">) 
 async function StaticRegionList() {
   const t = await getTranslations("map");
   return (
-    <section aria-labelledby="liste-regions-statique">
+    <section aria-labelledby="liste-regions-statique" className="mx-auto max-w-6xl px-4 py-8">
       <h2 id="liste-regions-statique" className="mb-4 text-xl font-bold">
         {t("regionList")}
       </h2>

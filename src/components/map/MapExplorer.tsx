@@ -1,17 +1,19 @@
 "use client";
 
-import { Mountain, X } from "lucide-react";
+import { Crosshair, Layers, Mountain, Pause, Play, SlidersHorizontal, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useSyncExternalStore } from "react";
-import type { PublicCible, RecitType } from "@/data/schemas";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { RECIT_TYPES, type PublicCible, type RecitType } from "@/data/schemas";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { filtersToQuery, matches, parseFilters, type Filters } from "@/lib/filters";
-import { TYPE_COLORS } from "@/lib/map/style";
+import { useReducedMotion } from "@/lib/a11y/motion";
+import { filtersToQuery, hasFilters, matches, parseFilters, type Filters } from "@/lib/filters";
+import { typeColor } from "@/lib/map/style";
 import { detectLowData, usePrefs } from "@/stores/prefs";
-import { FilterBar, type FilterOptions } from "@/components/ui/FilterBar";
+import type { FilterOptions } from "@/components/ui/FilterBar";
 import { StoryTypeIcon } from "@/components/ui/Pictogram";
+import type { MapLayers } from "./StoryMap";
 
 export interface MapStory {
   id: string;
@@ -22,6 +24,7 @@ export interface MapStory {
   langueIds: string[];
   themeIds: string[];
   publicCible: PublicCible;
+  lieu?: [number, number];
 }
 
 export interface MapRegion {
@@ -50,21 +53,26 @@ const StoryMap = dynamic(() => import("./StoryMap"), {
 function MapPlaceholder() {
   const t = useTranslations("map");
   return (
-    <div className="flex h-full items-center justify-center text-muted" aria-hidden>
-      {t("loading")}
+    <div className="flex h-full items-center justify-center" aria-hidden>
+      <span className="float-panel px-5 py-3 font-bold">{t("loading")}</span>
     </div>
   );
 }
 
 const noop = () => () => {};
+const TOUR_STEP_MS = 5000;
+// Main types shown as chips; fables are found under "conte".
+const TYPE_CHIPS = RECIT_TYPES.filter((type) => type !== "fable");
 
 export function MapExplorer({ regions, stories, options }: Props) {
   const t = useTranslations("map");
+  const tf = useTranslations("filters");
   const tr = useTranslations("region");
   const types = useTranslations("storyTypes");
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const reducedMotion = useReducedMotion();
 
   const filters = parseFilters(params);
   const selectedSlug = params.get("region") ?? undefined;
@@ -76,12 +84,34 @@ export function MapExplorer({ regions, stories, options }: Props) {
   const setLowDataOverride = usePrefs((s) => s.setLowDataOverride);
   const lowData = lowDataOverride ?? autoLowData;
 
+  const [layers, setLayers] = useState<MapLayers>({ relief: false, sites: false });
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [recenterNonce, setRecenterNonce] = useState(0);
+  const [tourIndex, setTourIndex] = useState<number | null>(null);
+
   const visible = useMemo(() => stories.filter((s) => matches(s, filters)), [stories, filters]);
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
     for (const s of visible) for (const r of s.regionIds) c[r] = (c[r] ?? 0) + 1;
     return c;
   }, [visible]);
+  const stats = {
+    recits: visible.length,
+    langues: new Set(visible.flatMap((s) => s.langueIds)).size,
+    regions: Object.keys(counts).length,
+  };
+
+  // Guided tour over the visible, located stories.
+  const tourStops = useMemo(() => visible.filter((s) => s.lieu), [visible]);
+  const tourStory = tourIndex === null ? undefined : tourStops[tourIndex];
+  useEffect(() => {
+    if (tourIndex === null) return;
+    const timer = setTimeout(() => {
+      setTourIndex((i) => (i === null || i + 1 >= tourStops.length ? null : i + 1));
+    }, TOUR_STEP_MS);
+    return () => clearTimeout(timer);
+  }, [tourIndex, tourStops.length]);
 
   function navigate(next: { filters?: Filters; region?: string | null; vue?: "2d" | "3d" }) {
     const q = new URLSearchParams(filtersToQuery(next.filters ?? filters).slice(1));
@@ -92,65 +122,130 @@ export function MapExplorer({ regions, stories, options }: Props) {
     const s = q.toString();
     router.replace(`${pathname}${s ? `?${s}` : ""}`, { scroll: false });
   }
-
-  const selectRegion = (id: string | undefined) =>
+  const setFilter = (patch: Partial<Filters>) => navigate({ filters: { ...filters, ...patch } });
+  const selectRegion = (id: string | undefined) => {
+    setTourIndex(null);
     navigate({ region: regions.find((r) => r.id === id)?.slug ?? null });
+  };
 
   const regionStories = selected ? visible.filter((s) => s.regionIds.includes(selected.id)) : [];
 
-  return (
-    <div className="flex flex-col gap-6">
-      <FilterBar
-        filters={filters}
-        options={options}
-        onChange={(f) => navigate({ filters: f })}
-        resultCount={visible.length}
-      />
-
-      <div className="flex flex-wrap items-center gap-3">
-        <div role="group" aria-label={t("modeLabel")} className="pill inline-flex border border-border p-1">
-          {(["2d", "3d"] as const).map((v) => (
-            <button
-              key={v}
-              type="button"
-              aria-pressed={(v === "3d") === mode3d}
-              disabled={v === "3d" && lowData}
-              onClick={() => navigate({ vue: v })}
-              className="pill inline-flex min-h-9 items-center gap-1 px-4 text-sm aria-pressed:bg-cta aria-pressed:text-cta-text disabled:opacity-50"
-            >
-              {v === "3d" ? <Mountain aria-hidden size={16} /> : null}
-              {v === "3d" ? t("mode3d") : t("mode2d")}
-            </button>
-          ))}
-        </div>
-        <label className="inline-flex min-h-11 items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="size-5 accent-[var(--accent)]"
-            checked={lowData}
-            onChange={(e) => setLowDataOverride(e.target.checked)}
-          />
-          {t("lowData")}
-          {lowDataOverride === null && autoLowData ? (
-            <span className="text-xs text-muted">({t("lowDataAuto")})</span>
-          ) : null}
-        </label>
-        <ul aria-label={t("legend")} className="ml-auto hidden flex-wrap gap-3 text-xs text-muted sm:flex">
-          {(["conte", "legende", "mythe_fondateur", "recit_historique"] as const).map((type) => (
-            <li key={type} className="inline-flex items-center gap-1.5">
-              <span aria-hidden className="size-3 rounded-full" style={{ background: TYPE_COLORS[type] }} />
-              {types(type)}
-            </li>
-          ))}
-        </ul>
+  const filterPanel = (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h2 className="text-xl font-bold">{t("panelTitle")}</h2>
+        <output aria-live="polite" className="text-sm text-muted">
+          {t("shownOf", { shown: visible.length, total: stories.length })}
+        </output>
       </div>
 
-      <div className="relative grid gap-4 lg:grid-cols-[1fr_22rem]">
-        <div
-          className="card h-[60vh] min-h-[22rem] overflow-hidden lg:h-[70vh]"
-          role="region"
-          aria-label={t("canvasLabel")}
+      <label className="text-sm font-bold">
+        {t("search")}
+        <input
+          type="search"
+          value={filters.q ?? ""}
+          placeholder={t("searchPlaceholder")}
+          onChange={(e) => setFilter({ q: e.target.value || undefined })}
+          className="mt-1 block min-h-11 w-full rounded-full border border-border bg-bg px-4 font-normal"
+        />
+      </label>
+
+      {options.langues.length > 0 ? (
+        <fieldset>
+          <legend className="mb-1 text-sm font-bold">{tf("language")}</legend>
+          <div className="flex flex-wrap gap-2">
+            {options.langues.map((l) => (
+              <Chip
+                key={l.id}
+                pressed={filters.langue === l.id}
+                onClick={() => setFilter({ langue: filters.langue === l.id ? undefined : l.id })}
+              >
+                {l.nom}
+              </Chip>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
+      <fieldset>
+        <legend className="mb-1 text-sm font-bold">{tf("type")}</legend>
+        <div className="flex flex-wrap gap-2">
+          {TYPE_CHIPS.map((type) => (
+            <Chip
+              key={type}
+              pressed={filters.type === type}
+              onClick={() => setFilter({ type: filters.type === type ? undefined : type })}
+            >
+              <span aria-hidden className="size-2.5 rounded-full" style={{ background: typeColor(type) }} />
+              {types(type)}
+            </Chip>
+          ))}
+        </div>
+      </fieldset>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="text-sm font-bold">
+          {tf("theme")}
+          <select
+            className="mt-1 block min-h-11 w-full rounded-full border border-border bg-bg px-3 font-normal"
+            value={filters.theme ?? ""}
+            onChange={(e) => setFilter({ theme: e.target.value || undefined })}
+          >
+            <option value="">{tf("all")}</option>
+            {options.themes.map((th) => (
+              <option key={th.id} value={th.id}>
+                {th.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm font-bold">
+          {tf("audience")}
+          <select
+            className="mt-1 block min-h-11 w-full rounded-full border border-border bg-bg px-3 font-normal"
+            value={filters.public ?? ""}
+            onChange={(e) => setFilter({ public: (e.target.value || undefined) as PublicCible | undefined })}
+          >
+            <option value="">{tf("all")}</option>
+            <option value="enfant">{tf("children")}</option>
+            <option value="tout_public">{tf("everyone")}</option>
+            <option value="adulte">{tf("adults")}</option>
+          </select>
+        </label>
+      </div>
+
+      <label className="text-sm font-bold">
+        {t("region")}
+        <select
+          className="mt-1 block min-h-11 w-full rounded-full border border-border bg-bg px-3 font-normal"
+          value={selected?.id ?? ""}
+          onChange={(e) => selectRegion(e.target.value || undefined)}
         >
+          <option value="">{t("allRegions")}</option>
+          {regions.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.nom}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {hasFilters(filters) ? (
+        <button
+          type="button"
+          className="self-start text-sm text-accent underline underline-offset-4"
+          onClick={() => navigate({ filters: {} })}
+        >
+          {tf("reset")}
+        </button>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-10">
+      <div className="relative h-[calc(100dvh-4rem)] min-h-[34rem] overflow-hidden">
+        <div className="absolute inset-0" role="region" aria-label={t("canvasLabel")}>
           <StoryMap
             counts={counts}
             visibleStoryIds={visible.map((s) => s.id)}
@@ -159,6 +254,10 @@ export function MapExplorer({ regions, stories, options }: Props) {
             onOpenStory={(slug) => router.push(`/contes/${slug}`)}
             mode3d={mode3d}
             lowData={lowData}
+            layers={layers}
+            focusPoint={tourStory?.lieu}
+            recenterNonce={recenterNonce}
+            reducedMotion={reducedMotion}
             labels={{
               canvas: t("canvasLabel"),
               stories: (count) => t("storiesCount", { count }),
@@ -168,12 +267,117 @@ export function MapExplorer({ regions, stories, options }: Props) {
           />
         </div>
 
+        {/* Filters: floating panel on desktop, folded sheet on mobile (one DOM copy). */}
+        <aside
+          id="filtres-mobile"
+          aria-label={t("panelTitle")}
+          className={`float-panel absolute inset-x-2 top-2 z-30 max-h-[calc(100%-1rem)] overflow-y-auto p-5 lg:inset-x-auto lg:top-4 lg:left-4 lg:z-10 lg:block lg:max-h-[calc(100%-2rem)] lg:w-80 ${filtersOpen ? "block" : "hidden"}`}
+        >
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(false)}
+            aria-label={t("closeFilters")}
+            className="absolute top-3 right-3 inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-hover lg:hidden"
+          >
+            <X aria-hidden size={20} />
+          </button>
+          {filterPanel}
+        </aside>
+        <button
+          type="button"
+          onClick={() => setFiltersOpen(true)}
+          className="float-panel absolute top-4 left-4 z-10 inline-flex min-h-11 items-center gap-2 px-4 font-bold lg:hidden"
+          aria-expanded={filtersOpen}
+          aria-controls="filtres-mobile"
+        >
+          <SlidersHorizontal aria-hidden size={18} />
+          {t("filtersButton")}
+          <span className="text-sm font-normal text-muted">({visible.length})</span>
+        </button>
+
+        {/* Map controls. */}
+        <div className="absolute top-4 right-4 z-30 flex flex-col items-end gap-2">
+          <div role="group" aria-label={t("modeLabel")} className="float-panel inline-flex p-1">
+            {(["2d", "3d"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                aria-pressed={(v === "3d") === mode3d}
+                disabled={v === "3d" && lowData}
+                onClick={() => navigate({ vue: v })}
+                className="inline-flex min-h-10 items-center gap-1 rounded-full px-4 text-sm font-bold aria-pressed:bg-cta aria-pressed:text-cta-text disabled:opacity-50"
+              >
+                {v === "3d" ? <Mountain aria-hidden size={16} /> : null}
+                {v === "3d" ? "3D" : "2D"}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setLayersOpen((o) => !o)}
+              aria-expanded={layersOpen}
+              aria-controls="calques"
+              className="float-panel inline-flex min-h-11 items-center gap-2 px-4 text-sm font-bold"
+            >
+              <Layers aria-hidden size={16} />
+              {t("layers")}
+            </button>
+            {layersOpen ? (
+              <div id="calques" className="float-panel absolute top-full right-0 mt-2 w-64 space-y-2 p-4">
+                <Toggle
+                  label={t("layerRelief")}
+                  checked={layers.relief && !lowData}
+                  disabled={lowData}
+                  onChange={(relief) => setLayers((l) => ({ ...l, relief }))}
+                />
+                <Toggle
+                  label={t("layerSites")}
+                  checked={layers.sites}
+                  onChange={(sites) => setLayers((l) => ({ ...l, sites }))}
+                />
+                <Toggle label={t("lowData")} checked={lowData} onChange={(v) => setLowDataOverride(v)} />
+                {lowDataOverride === null && autoLowData ? (
+                  <p className="text-xs text-muted">{t("lowDataAuto")}</p>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setTourIndex((i) => (i === null && tourStops.length > 0 ? 0 : null))}
+            aria-pressed={tourIndex !== null}
+            disabled={tourStops.length === 0}
+            title={tourStops.length === 0 ? t("tourEmpty") : undefined}
+            className="float-panel inline-flex min-h-11 items-center gap-2 px-4 text-sm font-bold aria-pressed:bg-cta aria-pressed:text-cta-text disabled:opacity-50"
+          >
+            {tourIndex === null ? <Play aria-hidden size={16} /> : <Pause aria-hidden size={16} />}
+            {tourIndex === null ? t("tour") : t("tourStop")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setTourIndex(null);
+              if (selected) selectRegion(undefined);
+              else setRecenterNonce((n) => n + 1);
+            }}
+            className="float-panel inline-flex min-h-11 items-center gap-2 px-4 text-sm font-bold"
+          >
+            <Crosshair aria-hidden size={16} />
+            {t("recenter")}
+          </button>
+        </div>
+
+        {/* Region panel: under the controls on desktop, bottom sheet on mobile. */}
         {selected ? (
           <aside
             aria-labelledby="panneau-region"
-            className="card fixed inset-x-0 bottom-0 z-30 max-h-[65vh] overflow-y-auto rounded-b-none p-5 shadow-glow lg:static lg:max-h-[70vh] lg:rounded-b-[var(--r-card)]"
+            className="float-panel absolute inset-x-2 bottom-2 z-20 max-h-[55%] overflow-y-auto p-5 lg:inset-x-auto lg:top-60 lg:right-4 lg:bottom-auto lg:max-h-[calc(100%-16rem)] lg:w-80"
           >
-            <div className="mb-4 flex items-start justify-between gap-2">
+            <div className="mb-3 flex items-start justify-between gap-2">
               <div>
                 <h2 id="panneau-region" className="text-xl font-bold">
                   {selected.nom}
@@ -192,14 +396,14 @@ export function MapExplorer({ regions, stories, options }: Props) {
 
             <h3 className="mb-2 text-base text-accent">{tr("stories")}</h3>
             {regionStories.length > 0 ? (
-              <ul className="mb-5 space-y-2">
+              <ul className="mb-4 space-y-1">
                 {regionStories.map((s) => (
                   <li key={s.id}>
                     <Link
                       href={`/contes/${s.slug}`}
-                      className="flex items-center gap-2 rounded-card p-2 hover:bg-surface-hover"
+                      className="flex items-center gap-2 rounded-[var(--r-card)] p-2 hover:bg-surface-hover"
                     >
-                      <StoryTypeIcon type={s.type} style={{ color: TYPE_COLORS[s.type] }} />
+                      <StoryTypeIcon type={s.type} style={{ color: typeColor(s.type) }} />
                       <span>
                         <span className="block font-bold">{s.titre}</span>
                         <span className="text-xs text-muted">{types(s.type)}</span>
@@ -209,7 +413,7 @@ export function MapExplorer({ regions, stories, options }: Props) {
                 ))}
               </ul>
             ) : (
-              <p className="mb-5 text-sm text-muted">{tr("noStories")}</p>
+              <p className="mb-4 text-sm text-muted">{tr("noStories")}</p>
             )}
 
             <PanelList title={tr("languages")} items={selected.langues} empty={tr("none")} />
@@ -219,17 +423,41 @@ export function MapExplorer({ regions, stories, options }: Props) {
               title={tr("sites")}
               items={selected.sites}
               empty={tr("none")}
-              more={selected.siteCount > selected.sites.length ? tr("moreSites", { count: selected.siteCount - selected.sites.length }) : undefined}
+              more={
+                selected.siteCount > selected.sites.length
+                  ? tr("moreSites", { count: selected.siteCount - selected.sites.length })
+                  : undefined
+              }
             />
-
-            <Link href={`/regions/${selected.slug}`} className="btn-cta mt-2">
+            <Link href={`/regions/${selected.slug}`} className="btn-cta mt-1">
               {t("seeRegion")}
             </Link>
           </aside>
         ) : null}
+
+        {/* Tour caption, or the stats card. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 hidden justify-center sm:flex">
+          {tourStory ? (
+            <div className="float-panel pointer-events-auto flex items-center gap-4 px-5 py-3" aria-live="polite">
+              <span className="text-xs text-muted">
+                {t("tourNow", { index: (tourIndex ?? 0) + 1, total: tourStops.length })}
+              </span>
+              <span className="font-bold">{tourStory.titre}</span>
+              <Link href={`/contes/${tourStory.slug}`} className="text-sm text-accent underline underline-offset-4">
+                {t("openStory")}
+              </Link>
+            </div>
+          ) : selected ? null : (
+            <dl className="float-panel pointer-events-auto flex gap-8 px-6 py-3 text-center">
+              <Stat value={stats.recits} label={t("statStories", { count: stats.recits })} />
+              <Stat value={stats.langues} label={t("statLanguages", { count: stats.langues })} />
+              <Stat value={stats.regions} label={t("statRegions", { count: stats.regions })} />
+            </dl>
+          )}
+        </div>
       </div>
 
-      <section aria-labelledby="liste-regions">
+      <section aria-labelledby="liste-regions" className="mx-auto w-full max-w-6xl px-4">
         <h2 id="liste-regions" className="text-xl font-bold">
           {t("regionList")}
         </h2>
@@ -242,8 +470,11 @@ export function MapExplorer({ regions, stories, options }: Props) {
                 <button
                   type="button"
                   aria-pressed={r.id === selected?.id}
-                  onClick={() => selectRegion(r.id)}
-                  className={`card flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-surface-hover aria-pressed:border-[var(--accent)] ${n === 0 ? "opacity-70" : ""}`}
+                  onClick={() => {
+                    selectRegion(r.id);
+                    window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+                  }}
+                  className={`card flex w-full items-center justify-between gap-3 p-3 text-left hover:bg-surface-hover aria-pressed:border-[var(--accent)] ${n === 0 ? "opacity-75" : ""}`}
                 >
                   <span>
                     <span className="block font-bold">{r.nom}</span>
@@ -260,10 +491,58 @@ export function MapExplorer({ regions, stories, options }: Props) {
   );
 }
 
+function Chip({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      onClick={onClick}
+      className="inline-flex min-h-10 items-center gap-2 rounded-full border border-border px-3.5 text-sm hover:bg-surface-hover aria-pressed:border-transparent aria-pressed:bg-cta aria-pressed:text-cta-text"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <label className={`flex min-h-10 items-center justify-between gap-3 text-sm ${disabled ? "opacity-50" : ""}`}>
+      {label}
+      <input
+        type="checkbox"
+        role="switch"
+        className="size-5 accent-[var(--accent)]"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+    </label>
+  );
+}
+
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex flex-col-reverse">
+      <dt className="text-sm text-muted">{label}</dt>
+      <dd className="font-display text-2xl font-bold">{value}</dd>
+    </div>
+  );
+}
+
 function PanelList({ title, items, empty, more }: { title: string; items: string[]; empty: string; more?: string }) {
   return (
-    <div className="mb-4">
-      <h3 className="mb-1 text-sm font-bold">{title}</h3>
+    <div className="mb-3">
+      <h3 className="mb-0.5 text-sm font-bold">{title}</h3>
       <p className="text-sm text-muted">
         {items.length > 0 ? items.join(" · ") : empty}
         {more ? ` ${more}` : null}

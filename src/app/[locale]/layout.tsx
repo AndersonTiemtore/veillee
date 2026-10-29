@@ -28,7 +28,10 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 }
 
 export const viewport: Viewport = {
-  themeColor: "#1b1a2e",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf3e6" },
+    { media: "(prefers-color-scheme: dark)", color: "#1b1a2e" },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -41,7 +44,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={contentLanguage(locale)}
-      data-theme="nuit"
+      data-theme="jour"
       className={andika.variable}
       suppressHydrationWarning
     >

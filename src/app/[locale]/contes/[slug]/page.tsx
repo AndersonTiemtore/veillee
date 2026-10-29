@@ -5,7 +5,7 @@ import { StoryTypeIcon } from "@/components/ui/Pictogram";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { ethnieById, langueById, recits, regionById, siteById, themeById } from "@/lib/data";
-import { TYPE_COLORS } from "@/lib/map/style";
+import { typeColor } from "@/lib/map/style";
 
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) => recits.map((r) => ({ locale, slug: r.slug })));
@@ -35,8 +35,8 @@ export default async function StoryPage({ params }: PageProps<"/[locale]/contes/
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
-      <p className="mb-3 inline-flex items-center gap-2 text-sm" style={{ color: TYPE_COLORS[r.type] }}>
-        <StoryTypeIcon type={r.type} />
+      <p className="mb-3 inline-flex items-center gap-2 text-sm text-muted">
+        <StoryTypeIcon type={r.type} style={{ color: typeColor(r.type) }} />
         {types(r.type)}
       </p>
       <h1 className="mb-6 text-2xl font-bold sm:text-3xl">{r.titre}</h1>

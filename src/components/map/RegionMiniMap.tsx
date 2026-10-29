@@ -46,11 +46,11 @@ export function RegionMiniMap({ regionId, label }: { regionId: string; label: st
           <path
             key={f.properties.id}
             d={path(f.geometry)}
-            fill={active ? "var(--flamme)" : "var(--indigo)"}
-            fillOpacity={active ? 0.9 : 0.6}
-            stroke="var(--karite)"
-            strokeOpacity={0.3}
-            strokeWidth={0.6}
+            fill={active ? "var(--map-region-active)" : "var(--map-region)"}
+            fillOpacity={active ? 0.95 : 0.45}
+            stroke="var(--map-line)"
+            strokeOpacity={active ? 0.9 : 0.35}
+            strokeWidth={active ? 1.4 : 0.6}
           />
         );
       })}

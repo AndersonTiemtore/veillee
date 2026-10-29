@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 import type { Recit } from "@/data/schemas";
 import { Link } from "@/i18n/navigation";
 import { langueById, regionById } from "@/lib/data";
-import { TYPE_COLORS } from "@/lib/map/style";
+import { typeColor } from "@/lib/map/style";
 import { SHOW_DRAFTS } from "@/lib/site";
 import { StoryTypeIcon } from "@/components/ui/Pictogram";
 
@@ -11,7 +11,7 @@ const minutes = (s?: number) => (s ? Math.max(1, Math.round(s / 60)) : undefined
 /** Catalogue card. No illustration has established rights yet: a pictogram stands in. */
 export function StoryCard({ recit }: { recit: Recit }) {
   const t = useTranslations();
-  const color = TYPE_COLORS[recit.type];
+  const color = typeColor(recit.type);
   const region = recit.regionIds.map((id) => regionById.get(id)?.nom).filter(Boolean).join(", ");
   const langues = [...new Set(recit.versions.map((v) => langueById.get(v.langueId)?.nom))].filter(Boolean);
   const duree = minutes(Math.max(0, ...recit.versions.map((v) => v.dureeSecondes ?? 0)));
@@ -25,7 +25,10 @@ export function StoryCard({ recit }: { recit: Recit }) {
       <div
         aria-hidden
         className="flex aspect-[16/9] items-center justify-center bg-bg"
-        style={{ color, backgroundImage: `radial-gradient(circle at 50% 120%, ${color}33, transparent 70%)` }}
+        style={{
+          color,
+          backgroundImage: `radial-gradient(circle at 50% 120%, color-mix(in srgb, ${color} 22%, transparent), transparent 70%)`,
+        }}
       >
         <StoryTypeIcon type={recit.type} width={56} height={56} />
       </div>

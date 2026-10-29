@@ -114,19 +114,32 @@
   }
 }
 
-/* MapLibre popup in the night palette. */
+/* Floating map panels and controls. */
+.float-panel {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-float);
+}
+button.float-panel:hover {
+  background: var(--surface-hover);
+}
+
+/* MapLibre popup in the current theme. */
 .veillee-popup .maplibregl-popup-content {
-  background: var(--nuit);
-  color: var(--karite);
-  border: 1px solid rgb(232 163 61 / 0.4);
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--r-card);
+  box-shadow: var(--shadow-float);
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
   padding: 0.625rem 0.875rem;
 }
 .veillee-popup .maplibregl-popup-tip {
-  border-top-color: var(--nuit);
-  border-bottom-color: var(--nuit);
+  border-top-color: var(--surface);
+  border-bottom-color: var(--surface);
 }
 .maplibregl-ctrl-attrib {
   font-family: var(--font-sans);

@@ -19,6 +19,7 @@ export function mapStories(): MapStory[] {
     langueIds: storyLangueIds(r),
     themeIds: r.themeIds,
     publicCible: r.publicCible,
+    lieu: r.lieu ? [r.lieu.lon, r.lieu.lat] : undefined,
   }));
 }
 

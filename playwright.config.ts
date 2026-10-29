@@ -5,6 +5,8 @@ const PORT = Number(process.env.PORT ?? 3100);
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
+  // Several WebGL maps rendering at once starve modest machines.
+  workers: 2,
   retries: process.env.CI ? 1 : 0,
   // MapLibre is loaded on demand; first paint can take a few seconds under load.
   expect: { timeout: 15_000 },

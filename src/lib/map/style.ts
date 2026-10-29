@@ -10,13 +10,63 @@ export const COLORS = {
   karite: "#f4ead5",
 } as const;
 
-export const TYPE_COLORS: Record<RecitType, string> = {
-  conte: COLORS.flamme,
-  fable: COLORS.flamme,
-  legende: COLORS.laterite,
-  mythe_fondateur: "#d9784a",
-  recit_historique: COLORS.karite,
+/** Map palette per theme: light "terre" (default) and night "veillée". */
+export const MAP_PALETTE = {
+  jour: {
+    background: "#faf3e6",
+    region: "#e3b448",
+    regionEmpty: "#efdcae",
+    regionHover: "#d08a2c",
+    regionActive: "#b5562b",
+    line: "#2a1d14",
+    lineActive: "#2a1d14",
+    cluster: "#2a1d14",
+    clusterText: "#faf3e6",
+    markerStroke: "#2a1d14",
+  },
+  nuit: {
+    background: COLORS.nuit,
+    region: COLORS.indigo,
+    regionEmpty: "#262f58",
+    regionHover: COLORS.indigoClair,
+    regionActive: COLORS.indigoClair,
+    line: COLORS.karite,
+    lineActive: COLORS.flamme,
+    cluster: COLORS.flamme,
+    clusterText: COLORS.nuit,
+    markerStroke: COLORS.nuit,
+  },
+} as const;
+export type MapPalette = (typeof MAP_PALETTE)[keyof typeof MAP_PALETTE];
+
+/** Hex story-type colours for MapLibre, mirroring the --type-* tokens. */
+export const TYPE_COLORS_BY_THEME: Record<"jour" | "nuit", Record<RecitType, string>> = {
+  jour: {
+    conte: COLORS.indigo,
+    fable: COLORS.indigo,
+    legende: COLORS.laterite,
+    mythe_fondateur: "#4f7a4a",
+    recit_historique: "#2a1d14",
+  },
+  nuit: {
+    conte: COLORS.flamme,
+    fable: COLORS.flamme,
+    legende: COLORS.laterite,
+    mythe_fondateur: "#d9784a",
+    recit_historique: COLORS.karite,
+  },
 };
+
+const TYPE_TOKEN: Record<RecitType, string> = {
+  conte: "conte",
+  fable: "conte",
+  legende: "legende",
+  mythe_fondateur: "mythe",
+  recit_historique: "historique",
+};
+
+/** Theme-aware CSS colour for a story type (DOM elements). */
+export const typeColor = (type: RecitType) => `var(--type-${TYPE_TOKEN[type]})`;
 
 /** Bounds of Burkina Faso with a small margin, [west, south, east, north]. */
 export const BF_BOUNDS: [number, number, number, number] = [-5.8, 9.2, 2.6, 15.3];

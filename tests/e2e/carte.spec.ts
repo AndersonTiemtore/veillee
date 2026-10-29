@@ -25,11 +25,33 @@ test("carte → Nakambé → Yennenga → page du récit", async ({ page }) => {
 });
 
 test("les filtres sont reflétés dans l'URL", async ({ page }) => {
-  await page.goto("/carte?type=fable");
-  await expect(page.getByLabel("Type de récit")).toHaveValue("fable");
-  await expect(page.getByText("1 récit", { exact: true })).toBeVisible();
+  await page.goto("/carte?type=legende");
+  // On mobile the filter panel is folded behind a button.
+  const open = page.getByRole("button", { name: /^Filtres/ });
+  if (await open.isVisible()) await open.click();
+
+  await expect(page.getByRole("button", { name: "Légende", pressed: true })).toBeVisible();
+  await expect(page.getByText("3 sur 5 affichés")).toBeVisible();
+
+  await page.getByRole("searchbox", { name: "Titre" }).fill("crocodiles");
+  await expect(page).toHaveURL(/q=crocodiles/);
+  await expect(page.getByText("2 sur 5 affichés")).toBeVisible();
+
   await page.getByRole("button", { name: "Effacer les filtres" }).click();
-  await expect(page).not.toHaveURL(/type=/);
+  await expect(page).not.toHaveURL(/type=|q=/);
+  await expect(page.getByText("5 sur 5 affichés")).toBeVisible();
+});
+
+test("contrôles flottants : calques, survol, recentrer", async ({ page }) => {
+  await page.goto("/carte");
+  await page.getByRole("button", { name: "Calques" }).click();
+  await expect(page.getByRole("switch", { name: "Relief" })).toBeVisible();
+  await page.getByRole("button", { name: "Calques" }).click();
+
+  await page.getByRole("button", { name: "Survoler" }).click();
+  await expect(page.getByRole("button", { name: "Arrêter le survol" })).toBeVisible();
+  await page.getByRole("button", { name: "Arrêter le survol" }).click();
+  await expect(page.getByRole("button", { name: "Recentrer" })).toBeVisible();
 });
 
 test("la liste des régions est disponible sans la carte", async ({ page }) => {
