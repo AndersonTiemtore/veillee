@@ -118,6 +118,14 @@
     "everyone": "Tout public",
     "adults": "Adultes",
     "reset": "Effacer les filtres",
+    "search": "Rechercher",
+    "searchPlaceholder": "Titre d'un récit",
+    "sort": "Trier",
+    "sortRecent": "Les plus récents",
+    "sortTitle": "De A à Z",
+    "sortDuration": "Par durée",
+    "empty": "Aucun récit ne correspond à ces filtres.",
+    "emptyHint": "Essayez une autre langue ou un autre thème, ou effacez les filtres.",
     "results": "{count, plural, =0 {Aucun récit ne correspond} one {# récit} other {# récits}}"
   },
   "region": {
@@ -149,6 +157,63 @@
     "languages": "Langues",
     "toRecord": "À enregistrer en",
     "noSummary": "Le résumé de ce récit est en cours de rédaction."
+  },
+  "player": {
+    "label": "Lecteur audio",
+    "play": "Lecture",
+    "pause": "Pause",
+    "back": "Reculer de 10 secondes",
+    "forward": "Avancer de 10 secondes",
+    "speed": "Vitesse",
+    "close": "Fermer le lecteur",
+    "progress": "Position dans le récit",
+    "loading": "Chargement…",
+    "error": "Le son n'a pas pu être lu.",
+    "demo": "Son de démonstration"
+  },
+  "modes": {
+    "label": "Façons de découvrir le récit",
+    "listen": "Écouter",
+    "read": "Lire",
+    "live": "Vivre"
+  },
+  "listen": {
+    "language": "Langue d'écoute",
+    "play": "Écouter ce récit",
+    "resume": "Reprendre",
+    "pause": "Mettre en pause",
+    "noAudio": "Aucun enregistrement n'est encore disponible dans cette langue.",
+    "transcript": "Transcription",
+    "transcriptHint": "Touchez une phrase pour l'écouter à partir de ce moment.",
+    "demoNotice": "Son de démonstration : des bips marquent chaque scène, en attendant l'enregistrement d'un conteur. Le texte provient de la base de connaissances.",
+    "duration": "{minutes, plural, one {# minute} other {# minutes}}"
+  },
+  "read": {
+    "textSize": "Taille du texte",
+    "smaller": "Réduire le texte",
+    "larger": "Agrandir le texte",
+    "inLanguage": "En {langue}",
+    "notYet": "Le texte dans cette langue est en cours de collecte.",
+    "single": "Seule la version en {langue} est disponible pour l'instant."
+  },
+  "credits": {
+    "title": "Collecte et droits",
+    "storyteller": "Conteur",
+    "unknownStoryteller": "En cours de collecte",
+    "collectedOn": "Date de collecte",
+    "license": "Licence",
+    "licenseValue": "CC BY-NC 4.0",
+    "sources": "Source",
+    "sourcesValue": "Base de connaissances OntoBurkina (IBAM – UJKZ)"
+  },
+  "around": {
+    "title": "Autour de ce récit",
+    "people": "Peuple d'origine",
+    "instrument": "Instrument associé",
+    "site": "Lieu d'ancrage",
+    "seeOnMap": "Voir sur la carte",
+    "related": "Récits liés",
+    "noRelated": "Aucun autre récit lié pour l'instant."
   },
   "dataReport": {
     "intro": "Les données de Veillée proviennent de l'ontologie OntoBurkina. Elles sont corrigées et enrichies automatiquement à chaque mise à jour du site ; les fichiers sources ne sont jamais modifiés. Ce rapport rend compte de ces corrections.",

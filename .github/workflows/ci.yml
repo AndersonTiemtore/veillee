@@ -19,6 +19,15 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
-      - run: npm run build
+      - name: Production build
+        run: npm run build
+      # The player and story modes only render in draft mode until stories
+      # are publishable, so e2e tests run against a draft build.
+      - name: Draft build for e2e
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SHOW_DRAFTS: "true"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_SHOW_DRAFTS: "true"

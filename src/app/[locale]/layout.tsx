@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { ThemeScript } from "@/components/layout/ThemeScript";
+import { MiniPlayer } from "@/components/player/MiniPlayer";
 import { contentLanguage } from "@/i18n/messages";
 import { routing } from "@/i18n/routing";
 import { andika, GENTIUM_PRELOAD } from "@/lib/fonts";
@@ -23,6 +24,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
     title: { default: `${t("siteName")} — ${t("tagline")}`, template: `%s · ${t("siteName")}` },
     description: t("description"),
     applicationName: t("siteName"),
+    icons: { icon: "/icon.svg" },
     openGraph: { siteName: t("siteName"), locale: "fr_BF", type: "website" },
   };
 }
@@ -65,6 +67,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             {children}
           </main>
           <Footer />
+          <MiniPlayer />
         </NextIntlClientProvider>
       </body>
     </html>

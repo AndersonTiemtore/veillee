@@ -40,9 +40,14 @@ export const SceneSchema = z.object({
 export type Scene = z.infer<typeof SceneSchema>;
 
 export const VersionSchema = z.object({
+  id,
   langueId: id,
   codeIso: z.string().min(2),
+  /** Opus (preferred) and AAC fallback. */
   audio: z.string().optional(),
+  audioFallback: z.string().optional(),
+  /** True for synthetic test media (scripts/make-demo-media.ts), never a recording. */
+  demo: z.boolean(),
   vtt: z.string().optional(),
   dureeSecondes: z.number().nonnegative().optional(),
   texte: z.string().optional(),
@@ -76,6 +81,7 @@ export const RecitSchema = z.object({
   estInteractif: z.boolean(),
   publicCible: PublicCibleSchema,
   statutCollecte: z.string(),
+  dateCollecte: z.string().optional(),
   publiable: z.boolean(),
   restreint: z.boolean(),
   liesA: z.array(id),

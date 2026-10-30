@@ -5,12 +5,22 @@
  * main bundle (import.meta.url), which Next's bundler does not preserve; the
  * map points to this copy with setWorkerUrl().
  */
-import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const ROOT = process.cwd();
 const OUT = join(ROOT, "public/vendor");
 mkdirSync(OUT, { recursive: true });
+
+// Local media are served from public/media until they are uploaded to Vercel
+// Blob (scripts/upload-media.ts); mediaUrl() prefers the Blob URL when known.
+if (existsSync(join(ROOT, "media"))) {
+  cpSync(join(ROOT, "media"), join(ROOT, "public/media"), {
+    recursive: true,
+    filter: (src) => !src.endsWith(".json"),
+  });
+  console.log("[vendor] media/ -> public/media/");
+}
 
 const maplibre = join(ROOT, "node_modules/maplibre-gl");
 const { version } = JSON.parse(readFileSync(join(maplibre, "package.json"), "utf8")) as { version: string };

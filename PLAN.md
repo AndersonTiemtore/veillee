@@ -36,12 +36,12 @@
 - [x] Playwright : carte → Nakambé → Yennenga → page du récit
 
 ## Phase 4 — Récits et lecteur
-- [ ] `/contes` (grille, filtres, tri, états vides)
-- [ ] `/contes/[slug]` : Écouter (VTT synchronisé, clic sur phrase) et Lire (bilingue)
-- [ ] Mini-lecteur persistant (Zustand + Howler), Media Session
-- [ ] États « en collecte » et « restreint »
-- [ ] SEO : metadata, OG image, JSON-LD
-- [ ] Médias de test `demo-*` (bip/silence + VTT)
+- [x] `/contes` (grille, filtres, tri, états vides)
+- [x] `/contes/[slug]` : Écouter (VTT synchronisé, clic sur phrase) et Lire (bilingue)
+- [x] Mini-lecteur persistant (Zustand + Howler), Media Session
+- [x] États « en collecte » et « restreint »
+- [x] SEO : metadata, OG image, JSON-LD
+- [x] Médias de test `demo-*` (bip/silence + VTT)
 
 ## Phase 5 — Immersion
 - [ ] Mode « Vivre » (GSAP ScrollTrigger, choix, fin, quiz)

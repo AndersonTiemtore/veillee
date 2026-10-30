@@ -29,6 +29,16 @@ export function FilterBar({ filters, options, onChange, resultCount }: Props) {
   return (
     <fieldset className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(4,minmax(0,1fr))_auto] md:items-end">
       <legend className="sr-only">{t("title")}</legend>
+      <label className="col-span-2 text-xs text-muted md:col-span-5">
+        {t("search")}
+        <input
+          type="search"
+          value={filters.q ?? ""}
+          placeholder={t("searchPlaceholder")}
+          onChange={(e) => set({ q: e.target.value || undefined })}
+          className={selectClass}
+        />
+      </label>
       <label className="text-xs text-muted">
         {t("type")}
         <select

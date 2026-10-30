@@ -223,8 +223,27 @@ function localityRegions(store: Store): Map<string, string> {
   return firstBy(rows, "l", "r");
 }
 
+interface DemoMedia {
+  audio: string;
+  audioFallback: string;
+  vtt: string;
+  dureeSecondes: number;
+  scenes: Record<string, [number, number]>;
+}
+
+/** Synthetic test media (media/demo-media.json), keyed by "recitId|langueId". */
+function loadDemoMedia(): Record<string, DemoMedia> {
+  try {
+    const raw = JSON.parse(readFileSync(join(ROOT, "media/demo-media.json"), "utf8")) as Record<string, unknown>;
+    return Object.fromEntries(Object.entries(raw).filter(([k]) => !k.startsWith("$"))) as Record<string, DemoMedia>;
+  } catch {
+    return {};
+  }
+}
+
 function extract(store: Store) {
   const regionOfLoc = localityRegions(store);
+  const demoMedia = loadDemoMedia();
   let externalMedia = 0;
   const media = (url: string | undefined) => {
     if (!url) return undefined;
@@ -379,13 +398,14 @@ function extract(store: Store) {
   const types = multimap(select(store, `SELECT ?r ?t WHERE { ?r a onto:RecitOral ; a ?t }`), "r", "t");
   const scalars = select(
     store,
-    `SELECT ?r ?slug ?titre ?resume ?public ?statut ?restreint WHERE {
+    `SELECT ?r ?slug ?titre ?resume ?public ?statut ?restreint ?date WHERE {
       ?r a onto:RecitOral ; onto:slug ?slug ; onto:titre ?titre .
       FILTER(LANG(?titre) = "fr" || LANG(?titre) = "")
       OPTIONAL { ?r onto:resume ?resume FILTER(LANG(?resume) = "fr" || LANG(?resume) = "") }
       OPTIONAL { ?r onto:publicCible ?public }
       OPTIONAL { ?r onto:statutCollecte ?statut }
       OPTIONAL { ?r onto:estRestreint ?restreint }
+      OPTIONAL { ?r onto:dateCollecte ?date }
     }`,
   );
   const scalarById = new Map(scalars.map((r) => [r.r!, r]));
@@ -483,12 +503,18 @@ function extract(store: Store) {
 
     const versions = versionRows
       .filter((v) => v.r === id)
-      .map((v) => ({
+      .map((v) => {
+        // Test media only fill in what the ontology does not provide.
+        const demo = v.audio ? undefined : demoMedia[`${id}|${v.langue}`];
+        return {
+        id: v.v!,
         langueId: v.langue!,
         codeIso: (v.code ?? langueById.get(v.langue!)?.codeIso ?? "und").split(/[;,\s]+/)[0]!,
-        audio: media(v.audio),
-        vtt: media(v.vtt),
-        dureeSecondes: v.duree ? Number(v.duree) : undefined,
+        audio: media(v.audio) ?? demo?.audio,
+        audioFallback: demo?.audioFallback,
+        demo: Boolean(demo),
+        vtt: media(v.vtt) ?? demo?.vtt,
+        dureeSecondes: v.duree ? Number(v.duree) : demo?.dureeSecondes,
         texte: v.texte,
         conteur: v.conteur,
         scenes: sceneRows
@@ -498,14 +524,15 @@ function extract(store: Store) {
             texte: sc.texte!,
             illustration: media(sc.illu),
             animation: media(sc.anim),
-            debutAudio: sc.debut ? Number(sc.debut) : undefined,
-            finAudio: sc.fin ? Number(sc.fin) : undefined,
+            debutAudio: sc.debut ? Number(sc.debut) : demo?.scenes[sc.ordre!]?.[0],
+            finAudio: sc.fin ? Number(sc.fin) : demo?.scenes[sc.ordre!]?.[1],
             choix: choixRows
               .filter((c) => c.s === sc.s)
               .map((c) => ({ libelle: c.libelle!, vraieFin: c.fin === "true", cibleOrdre: Number(c.cible) })),
           }))
           .sort((a, b) => a.ordre - b.ordre),
-      }));
+        };
+      });
 
     return {
       id,
@@ -529,6 +556,7 @@ function extract(store: Store) {
         ? s.public
         : "tout_public") as Recit["publicCible"],
       statutCollecte: s.statut ?? "a_collecter",
+      dateCollecte: s.date,
       publiable: t.includes("RecitPubliable"),
       restreint: s.restreint === "true",
       liesA: liesByRecit.get(id) ?? [],
