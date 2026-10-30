@@ -61,8 +61,5 @@
     "typescript": "^5",
     "vitest": "^5.0.5",
     "wellknown": "^0.5.0"
-  },
-  "optionalDependencies": {
-    "@rolldown/binding-win32-x64-msvc": "^1.2.16"
   }
 }
