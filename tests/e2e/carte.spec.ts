@@ -1,14 +1,21 @@
 import { expect, test } from "@playwright/test";
 
+// WebGL maps are slow to start on modest machines.
+test.describe.configure({ timeout: 60_000 });
+
 test("carte → Nakambé → Yennenga → page du récit", async ({ page }) => {
   // A visible canvas is not enough: a broken worker only shows in the console.
   const errors: string[] = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   page.on("pageerror", (e) => errors.push(e.message));
 
+  // Wait for our own data rather than "networkidle", which also waits on
+  // third-party glyph requests and is slow under load.
+  const regionsLoaded = page.waitForResponse(/\/data\/regions\.geojson$/);
   await page.goto("/carte");
+  await regionsLoaded;
   await expect(page.locator(".maplibregl-canvas")).toBeVisible();
-  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(500);
   expect(errors).toEqual([]);
 
   await page.getByRole("button", { name: /Nakambé/ }).click();

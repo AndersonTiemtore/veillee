@@ -44,10 +44,10 @@
 - [x] Médias de test `demo-*` (bip/silence + VTT)
 
 ## Phase 5 — Immersion
-- [ ] Mode « Vivre » (GSAP ScrollTrigger, choix, fin, quiz)
-- [ ] Animation d'accueil (Rive, repli SVG), passable
-- [ ] `/frise`, `/jeunesse`, recherche ⌘K (Fuse.js)
-- [ ] `prefers-reduced-motion`
+- [x] Mode « Vivre » (GSAP ScrollTrigger, choix, fin, quiz)
+- [x] Animation d'accueil (Rive, repli SVG), passable
+- [x] `/frise`, `/jeunesse`, recherche ⌘K (Fuse.js)
+- [x] `prefers-reduced-motion`
 
 ## Phase 6 — Hors ligne, contributions, API
 - [ ] Serwist, « Garder pour la veillée », `/hors-ligne`

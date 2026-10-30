@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { Flamme } from "@/components/ui/Pictogram";
 import { Link } from "@/i18n/navigation";
 import { MainNav } from "./MainNav";
+import { SearchPalette } from "./SearchPalette";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
@@ -23,6 +24,7 @@ export function Header() {
           {t("meta.siteName")}
         </Link>
         <MainNav />
+        <SearchPalette />
         <ThemeToggle />
       </div>
     </header>

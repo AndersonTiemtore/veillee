@@ -28,6 +28,7 @@
     "skipIntro": "Passer l'introduction",
     "storyOfTheNight": "Le conte de la veillée",
     "storyOfTheNightEmpty": "Les premiers récits sont en cours de collecte auprès des conteurs. Revenez bientôt.",
+    "storyOfTheNightCta": "Écouter ce récit",
     "exploreMap": "Explorer la carte",
     "exploreMapHint": "17 régions, des récits ancrés dans leurs lieux",
     "counters": {
@@ -195,6 +196,50 @@
     "inLanguage": "En {langue}",
     "notYet": "Le texte dans cette langue est en cours de collecte.",
     "single": "Seule la version en {langue} est disponible pour l'instant."
+  },
+  "live": {
+    "intro": "Vivez le récit scène par scène. À certains moments, c'est à vous de choisir la suite.",
+    "start": "Commencer la veillée",
+    "sound": "Son des scènes",
+    "scene": "Scène {n}",
+    "next": "Continuer",
+    "choose": "Que se passe-t-il ensuite ?",
+    "detour": "Ce n'est pas ainsi que le récit se poursuit… Le conteur reprend un peu plus tôt.",
+    "end": "Fin du récit",
+    "moral": "Morale",
+    "restart": "Revivre le récit"
+  },
+  "quiz": {
+    "title": "As-tu bien écouté ?",
+    "question": "« {context} » Que se passe-t-il ensuite ?",
+    "right": "Bravo, c'est bien ainsi que le récit se poursuit !",
+    "wrong": "Pas tout à fait. Écoute encore et essaie une autre réponse.",
+    "again": "Recommencer"
+  },
+  "search": {
+    "open": "Rechercher",
+    "label": "Rechercher un récit, une région, une langue ou un thème",
+    "placeholder": "Yennenga, Nakambé, mooré…",
+    "empty": "Aucun résultat pour « {query} ».",
+    "hint": "Tapez au moins deux lettres.",
+    "close": "Fermer la recherche",
+    "kinds": {
+      "recit": "Récit",
+      "region": "Région",
+      "langue": "Langue",
+      "theme": "Thème"
+    }
+  },
+  "timeline": {
+    "intro": "Les mythes fondateurs et les récits historiques, placés dans le temps.",
+    "empty": "Les époques de ces récits n'ont pas encore été renseignées dans la base de connaissances. Ils apparaîtront sur la frise dès qu'elles le seront.",
+    "undated": "Récits en attente de datation"
+  },
+  "youth": {
+    "intro": "Des contes pour les plus jeunes, à écouter et à lire, avec une petite question à la fin.",
+    "empty": "Les contes pour enfants sont en cours de collecte.",
+    "noQuiz": "La question de ce conte arrivera avec son enregistrement.",
+    "open": "Découvrir le conte"
   },
   "credits": {
     "title": "Collecte et droits",

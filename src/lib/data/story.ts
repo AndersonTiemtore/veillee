@@ -34,6 +34,14 @@ export function readColumns(r: Recit): ReadColumn[] {
     .map((v) => ({ langue: langueName(v), lang: bcp47(v.codeIso), paragraphs: versionParagraphs(v) }));
 }
 
+/** The version carrying the interactive scenes, and its audio if any. */
+export function liveVersion(r: Recit) {
+  const version = r.versions.find((v) => v.scenes.length > 0);
+  if (!version) return undefined;
+  const listen = listenVersions(r).find((l) => l.id === version.id);
+  return { version, listen };
+}
+
 /** "Vous aimerez aussi": shared character, then shared theme, then same region (Q8). */
 export function relatedStories(r: Recit, limit = 4): Recit[] {
   const score = (o: Recit) =>

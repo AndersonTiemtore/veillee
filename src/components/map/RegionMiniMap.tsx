@@ -35,19 +35,31 @@ function loadFeatures(): Feature[] {
   return cache;
 }
 
-/** Static SVG locator: the whole country, with one region highlighted. */
-export function RegionMiniMap({ regionId, label }: { regionId: string; label: string }) {
+/**
+ * Static SVG map of the country (no JavaScript): one active region
+ * (`regionId`), or a set of highlighted ones (regions with stories).
+ */
+export function RegionMiniMap({
+  regionId,
+  highlighted,
+  label,
+}: {
+  regionId?: string;
+  highlighted?: string[];
+  label: string;
+}) {
   const features = loadFeatures();
   return (
     <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={label} className="h-auto w-full">
       {features.map((f) => {
         const active = f.properties.id === regionId;
+        const lit = highlighted?.includes(f.properties.id);
         return (
           <path
             key={f.properties.id}
             d={path(f.geometry)}
             fill={active ? "var(--map-region-active)" : "var(--map-region)"}
-            fillOpacity={active ? 0.95 : 0.45}
+            fillOpacity={active ? 0.95 : lit ? 0.9 : 0.35}
             stroke="var(--map-line)"
             strokeOpacity={active ? 0.9 : 0.35}
             strokeWidth={active ? 1.4 : 0.6}

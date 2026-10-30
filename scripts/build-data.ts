@@ -398,7 +398,7 @@ function extract(store: Store) {
   const types = multimap(select(store, `SELECT ?r ?t WHERE { ?r a onto:RecitOral ; a ?t }`), "r", "t");
   const scalars = select(
     store,
-    `SELECT ?r ?slug ?titre ?resume ?public ?statut ?restreint ?date WHERE {
+    `SELECT ?r ?slug ?titre ?resume ?public ?statut ?restreint ?date ?morale WHERE {
       ?r a onto:RecitOral ; onto:slug ?slug ; onto:titre ?titre .
       FILTER(LANG(?titre) = "fr" || LANG(?titre) = "")
       OPTIONAL { ?r onto:resume ?resume FILTER(LANG(?resume) = "fr" || LANG(?resume) = "") }
@@ -406,6 +406,10 @@ function extract(store: Store) {
       OPTIONAL { ?r onto:statutCollecte ?statut }
       OPTIONAL { ?r onto:estRestreint ?restreint }
       OPTIONAL { ?r onto:dateCollecte ?date }
+      OPTIONAL {
+        ?r onto:aPourMorale/onto:enonceMorale ?morale
+        FILTER(LANG(?morale) = "fr" || LANG(?morale) = "")
+      }
     }`,
   );
   const scalarById = new Map(scalars.map((r) => [r.r!, r]));
@@ -557,6 +561,7 @@ function extract(store: Store) {
         : "tout_public") as Recit["publicCible"],
       statutCollecte: s.statut ?? "a_collecter",
       dateCollecte: s.date,
+      morale: s.morale,
       publiable: t.includes("RecitPubliable"),
       restreint: s.restreint === "true",
       liesA: liesByRecit.get(id) ?? [],
@@ -601,14 +606,15 @@ function extract(store: Store) {
 // Output
 // ---------------------------------------------------------------------------
 
-/** GeoJSON is also served as static files, fetched by the map at runtime. */
+/** Files also served statically: GeoJSON for the map, the search index for ⌘K. */
 const PUBLIC_OUT = join(ROOT, "public/data");
+const PUBLIC_FILES = /\.geojson$|^search-index\.json$/;
 
 function write(name: string, data: unknown) {
-  const geo = name.endsWith(".geojson");
-  const body = JSON.stringify(data, null, geo ? 0 : 1);
+  const isPublic = PUBLIC_FILES.test(name);
+  const body = JSON.stringify(data, null, isPublic ? 0 : 1);
   writeFileSync(join(OUT, name), body);
-  if (geo) writeFileSync(join(PUBLIC_OUT, name), body);
+  if (isPublic) writeFileSync(join(PUBLIC_OUT, name), body);
 }
 
 function validate<T>(name: string, schema: z.ZodType<T>, data: unknown): T {

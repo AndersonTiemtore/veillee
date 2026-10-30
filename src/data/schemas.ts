@@ -82,6 +82,7 @@ export const RecitSchema = z.object({
   publicCible: PublicCibleSchema,
   statutCollecte: z.string(),
   dateCollecte: z.string().optional(),
+  morale: z.string().optional(),
   publiable: z.boolean(),
   restreint: z.boolean(),
   liesA: z.array(id),

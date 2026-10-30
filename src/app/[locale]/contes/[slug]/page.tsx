@@ -20,7 +20,9 @@ import {
   siteById,
   themeById,
 } from "@/lib/data";
-import { listenVersions, readColumns, relatedStories } from "@/lib/data/story";
+import { listenVersions, liveVersion, readColumns, relatedStories } from "@/lib/data/story";
+import { quizFromScenes } from "@/lib/quiz";
+import { LiveMode } from "@/components/story/LiveMode";
 import { typeColor } from "@/lib/map/style";
 import { bcp47 } from "@/lib/media/vtt";
 import { SHOW_DRAFTS, siteUrl } from "@/lib/site";
@@ -92,6 +94,7 @@ export default async function StoryPage({ params }: PageProps<"/[locale]/contes/
   const draft = visible && !r.publiable;
   const conteurs = [...new Set(r.versions.map((v) => v.conteur).filter(Boolean))];
   const related = relatedStories(r);
+  const live = liveVersion(r);
 
   const illustration = (
     <div aria-hidden className="flex size-full items-center justify-center" style={{ color: typeColor(r.type) }}>
@@ -145,6 +148,37 @@ export default async function StoryPage({ params }: PageProps<"/[locale]/contes/
                 ),
               },
               { id: "lire", label: tm("read"), content: <ReadMode columns={readColumns(r)} /> },
+              ...(live && r.estInteractif
+                ? [
+                    {
+                      id: "vivre",
+                      label: tm("live"),
+                      content: (
+                        <LiveMode
+                          scenes={live.version.scenes}
+                          type={r.type}
+                          lang={bcp47(live.version.codeIso)}
+                          track={
+                            live.listen && live.listen.sources.length > 0
+                              ? {
+                                  id: live.listen.id,
+                                  slug: r.slug,
+                                  titre: r.titre,
+                                  langue: live.listen.langue,
+                                  lang: live.listen.lang,
+                                  sources: live.listen.sources,
+                                  vtt: live.listen.vtt,
+                                  demo: live.listen.demo,
+                                }
+                              : undefined
+                          }
+                          morale={r.morale}
+                          quizzes={quizFromScenes(live.version.scenes)}
+                        />
+                      ),
+                    },
+                  ]
+                : []),
             ]}
           />
         </div>

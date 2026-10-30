@@ -9,8 +9,8 @@ interface Tab {
 }
 
 /** WAI-ARIA tabs: arrow keys move between tabs, Home/End jump to the ends. */
-export function StoryTabs({ tabs, label }: { tabs: Tab[]; label: string }) {
-  const [active, setActive] = useState(tabs[0]?.id);
+export function StoryTabs({ tabs, label, initial }: { tabs: Tab[]; label: string; initial?: string }) {
+  const [active, setActive] = useState(tabs.some((t) => t.id === initial) ? initial : tabs[0]?.id);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const base = useId();
 
